@@ -1,0 +1,19 @@
+#icon-contact-forms-cimatti-logo {
+    background: url("img/cimatti-32-icon.png") no-repeat scroll 0 0 transparent;
+}
+
+#accua-forms-graph-content {
+  padding:20px;
+}
+
+#accua-form-report-graph {
+  height: 300px;
+}
+
+#version, #version a {
+  color:#aaa;
+}
+
+.js .accua-forms-metabox-holder .postbox .hndle {
+  cursor:auto;
+}
