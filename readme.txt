@@ -3,7 +3,7 @@ Contributors: cimatti
 Donate link: http://www.cimatti.it/
 Tags: contact, form, forms, contact form, feedback, mail, email, ajax, attachment, curriculum, contact forms, contact us, custom form, email, excel, form builder, web form, feedback, form manager, form to email, form to database, landing page, file upload form, email form, landing page, customer request, spare parts, invitations, event forms, qtranslate forms, 
 Requires at least: 3.5
-Tested up to: 3.5.2
+Tested up to: 3.6
 Stable tag: 1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
