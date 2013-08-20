@@ -1,9 +1,6 @@
 <?php
 class AccuaForm_Validation_Password extends Validation {
-	protected $privateKey;
-	
-	public function __construct($privateKey, $message = "") {
-		$this->privateKey = $privateKey;
+	public function __construct($message = "") {
 		if(empty($message)) {
 			$this->message = __("Attention: Your passwords do not match.", 'accua-form-api');
 		} else {
@@ -31,4 +28,4 @@ class AccuaForm_Validation_Password extends Validation {
 			$valid = true; }
 		return $valid;	
 	}
-}'
+}

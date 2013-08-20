@@ -1,4 +1,13 @@
 jQuery(function($){
+  $('#accua_form_style_border_color .accua_form_value').wpColorPicker();
+  $('#accua_form_style_background_color .accua_form_value').wpColorPicker();
+  $('#accua_form_style_color .accua_form_value').wpColorPicker();
+  $('#accua_form_style_field_border_color .accua_form_value').wpColorPicker();
+  $('#accua_form_style_field_background_color .accua_form_value').wpColorPicker();
+  $('#accua_form_style_field_color .accua_form_value').wpColorPicker();
+  $('#accua_form_style_submit_border_color .accua_form_value').wpColorPicker();
+  $('#accua_form_style_submit_background_color .accua_form_value').wpColorPicker();
+  $('#accua_form_style_submit_color .accua_form_value').wpColorPicker();
   
   function get_tinymce_content(name){
     if (jQuery("#"+name+" .wp-editor-wrap").hasClass("tmce-active")){
@@ -31,7 +40,7 @@ jQuery(function($){
     }
     
     $.each(
-        ['success_message','error_message','emails_from','admin_emails_to','emails_bcc','admin_emails_subject','admin_emails_message','confirmation_emails_subject','confirmation_emails_message'],
+        ['success_message','error_message','emails_from','admin_emails_to','emails_bcc','admin_emails_subject','admin_emails_message','confirmation_emails_subject','confirmation_emails_message','style_margin','style_border_color','style_border_width','style_border_radius','style_background_color','style_padding','style_color','style_font_size','style_field_spacing','style_field_border_color','style_field_border_width','style_field_border_radius','style_field_background_color','style_field_padding','style_field_color','style_submit_border_color','style_submit_border_width','style_submit_border_radius','style_submit_background_color','style_submit_padding','style_submit_color','style_submit_font_size'],
         function(i,key){
           var value = $('#accua_form_'+key+' .accua_form_check_override:checked').val();
           if(value!=undefined && value!=0) {

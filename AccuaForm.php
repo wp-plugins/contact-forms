@@ -478,6 +478,11 @@ class AccuaForm extends Form {
   }
   
   public static function getSumbittedID() {
+    trigger_error('Use getSubmittedID() instead', (defined('E_USER_DEPRECATED')?E_USER_DEPRECATED:E_USER_NOTICE));
+    return self::getSubmittedID();
+  }
+  
+  public static function getSubmittedID() {
     if (self::isSubmit()) {
       return self::$submittedID;
     } else {

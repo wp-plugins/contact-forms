@@ -72,17 +72,33 @@ function accua_dashboard_page()
     WHERE `afs_id` = `afsv_sub_id`
     AND afsv_field_id IN ({$email_fields_string})", ARRAY_A);
   
+  
+  $forms_data = get_option('accua_forms_saved_forms', array());
+  
+  $fid = '';
+  $fid_param = '';
+  if (isset($_GET['fid'])) {
+    $fid = stripslashes( (string) $_GET['fid'] );
+    if (isset($forms_data[$fid])) {
+      $fid_param = $wpdb->prepare('AND afs_form_id = %s', $fid);
+    } else {
+      $fid = '';
+    }
+  }
+  
+  
   //costruisco il grafico
   
   $query_grafico = $wpdb->get_results("SELECT YEAR( afs_submitted ) AS `year` , MONTH( afs_submitted ) AS `month` , COUNT( * ) AS `submissions` , COUNT( DISTINCT (`afsv_value`)) AS `unique_submissions`
   FROM `{$wpdb->prefix}accua_forms_submissions` , `{$wpdb->prefix}accua_forms_submissions_values`
   WHERE `afs_id` = `afsv_sub_id`
   AND afsv_field_id IN ({$email_fields_string})
+  $fid_param
   GROUP BY `year` , `month`
   ORDER BY `year` DESC , `month` DESC");
    ?>
    
-  <div class="wrap">
+  <div id="accua_dashboard_page" class="accua_forms_admin_page wrap">
     <div id="icon-contact-forms-cimatti-logo" class="icon32"><br></div>
     <h2>WordPress Contact Forms by Cimatti</h2>
     <div class="metabox-holder accua-forms-metabox-holder">
@@ -95,11 +111,31 @@ function accua_dashboard_page()
 	          <tr class="first"><td class="first b"><?php echo $num_submissions[0]['num_row']; ?></td><td class="t"><?php _e('Submissions', 'accua-form-api'); ?></td></tr>
 	          <tr class="first"><td class="first b"><?php echo $num_emails[0]['num_row']; ?></td><td class="t"><?php _e('Distinct Emails', 'accua-form-api'); ?></td></tr>
 	        </table>
-          <div id="accua-forms-graph-content" ><div id="accua-form-report-graph" style="width: 99%"></div>
-        </div>
-	    <?php
+	        <form method="get">
+	        <input type="hidden" name="page" value="accua_forms" />
+	        <select name="fid">
+	        <?php
+	        $selected = ($fid === '') ? 'selected="selected"' : '';
+	        echo "<option value='' $selected >", __('Submissions from all forms', 'accua-form-api'),'</option>';
+	        foreach($forms_data as $ffid => $form) {
+	          $selected = ($fid == $ffid) ? 'selected="selected"' : '';
+	          $title = trim($form['title']);
+	          if ($title === '') {
+	            $title = $ffid;
+	          }
+	          $ffid = htmlspecialchars($ffid, ENT_QUOTES);
+	          $title = htmlspecialchars($title, ENT_QUOTES);
+	          echo "<option value='$ffid' $selected >$title</option>";
+	        }
+	        ?>
+	        </select>
+	        <input type="submit" value="<?php _e('filter', 'accua-form-api') ?>" />
+	        </form>
+          
+	   <?php
+	   if ($query_grafico) {
+       echo '<div id="accua-forms-graph-content" ><div id="accua-form-report-graph" style="width: 99%"></div></div>';
 
-	     if ($query_grafico) {
        $data = array(
           array( 'label' => __('Unique monthly Submissions', 'accua-form-api'), 'data' => array()),
           array( 'label' => __('Total monthly Submissions', 'accua-form-api'), 'data' => array()),
@@ -151,6 +187,8 @@ function accua_dashboard_page()
       });
       </script>
       <?php
+        } else {
+          echo '<p style="height:100px;">', __('No forms submitted', 'accua-form-api'), '</p>';
         } ?>
       <?php 
          $plugin_data = get_plugin_data(__FILE__);
@@ -227,6 +265,9 @@ function accua_forms_install(){
   dbDelta($sql);
   
   $avail_fields = get_option('accua_forms_avail_fields', array());
+  if (!is_array($avail_fields)) {
+    $avail_fields = array();
+  }
   $avail_fields += array(
     'first_name' => array(
       'id' => 'first_name',
@@ -538,13 +579,23 @@ Zimbabwe",
       'default_value' =>  '',
       'allowed_values' =>  '',
     ),
+    'captcha' => array(
+      'id' => 'captcha',
+      'name' => 'Captcha',
+      'type' => 'captcha',
+      'description' => '',
+      'default_value' =>  '',
+      'allowed_values' =>  '',
+    ),
   );
   update_option('accua_forms_avail_fields', $avail_fields);
   
   
   $form_data = get_option('accua_forms_default_form_data',array());
+  if (!is_array($form_data)) {
+    $form_data = array();
+  }
   $form_data += array(
-    'layout' => 'sidebyside',
     'success_message' => '<div style="padding: 10px; background-color: #fbf8b2; border: 1px solid #f7c84b;">
 <h2>Thank you {first_name} {last_name},</h2>
 We have received your contact request. Check your inbox for the confirmation message.
@@ -642,6 +693,30 @@ Sincerely,
 The Website Team
 
 <hr />',
+
+    'layout' => 'sidebyside',
+    'style_margin' => '',
+    'style_border_color' => '',
+    'style_border_width' => '',
+    'style_border_radius' => '',
+    'style_background_color' => '',
+    'style_padding' => '',
+    'style_color' => '',
+    'style_font_size' => '',
+    'style_field_spacing' => '',
+    'style_field_border_color' => '',
+    'style_field_border_width' => '',
+    'style_field_border_radius' => '',
+    'style_field_background_color' => '',
+    'style_field_padding' => '',
+    'style_field_color' => '',
+    'style_submit_border_color' => '',
+    'style_submit_border_width' => '',
+    'style_submit_border_radius' => '',
+    'style_submit_background_color' => '',
+    'style_submit_padding' => '',
+    'style_submit_color' => '',
+    'style_submit_font_size' => '',
   );
   update_option('accua_forms_default_form_data', $form_data);
 

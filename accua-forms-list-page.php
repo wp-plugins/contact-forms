@@ -49,27 +49,27 @@ class Accua_Forms_List_Table extends WP_List_Table {
     }
     
     function column_title($item){
-        if ($item['deleted']) {
-          if (isset($item['title'])) {
-            $item_name = $item['title'];
-          } else {
-            $item_name = $item['ID'];
-          }
-          $actions = array(
-              'edit' => "<a href='admin.php?page=accua_forms_list&amp;fid={$item['ID']}&amp;restore=1'>".__("Restore", 'accua-form-api')."</a>",
-          );
-          return "<strong>".$item_name."</strong>".$this->row_actions($actions);
+      if ($item['deleted']) {
+        if (isset($item['title'])) {
+          $item_name = $item['title'];
         } else {
-          $item_name = '"'.$item['ID'].'"';
-          $actions = array(
-              'edit' => "<a href='admin.php?page=accua_forms_list&amp;fid={$item['ID']}'>".__("Edit", 'accua-form-api')."</a>"
-                  . " &middot; <a href='admin.php?page=accua_forms_add&amp;clonefrom={$item['ID']}'>".__("Clone", 'accua-form-api')."</a>"
-                  . " &middot; <a href='admin.php?page=accua_forms_submissions_list&amp;fid={$item['ID']}'>".__("Report", 'accua-form-api')."</a>"
-                  . " &middot; <a href='admin.php?page=accua_forms_list&amp;fid_del={$item['ID']}'>".__("Trash", 'accua-form-api')."</a>",
-          );
-         return "<strong><a class='row-title' href='admin.php?page=accua_forms_list&amp;fid=".$item['ID']."'>".$item['title']."</a></strong>".$this->row_actions($actions);
+          $item_name = $item['ID'];
         }
-   }
+        $actions = array(
+            'edit' => "<a href='admin.php?page=accua_forms_list&amp;fid={$item['ID']}&amp;restore=1'>".__("Restore", 'accua-form-api')."</a>",
+        );
+        return "<strong>".$item_name."</strong>".$this->row_actions($actions);
+      } else {
+        $item_name = '"'.$item['ID'].'"';
+        $actions = array(
+            'edit' => "<a href='admin.php?page=accua_forms_list&amp;fid={$item['ID']}'>".__("Edit", 'accua-form-api')."</a>"
+                . " &middot; <a href='admin.php?page=accua_forms_add&amp;clonefrom={$item['ID']}'>".__("Clone", 'accua-form-api')."</a>"
+                . " &middot; <a href='admin.php?page=accua_forms_submissions_list&amp;fid={$item['ID']}'>".__("Report", 'accua-form-api')."</a>"
+                . " &middot; <a href='admin.php?page=accua_forms_list&amp;fid_del={$item['ID']}'>".__("Trash", 'accua-form-api')."</a>",
+        );
+        return "<strong><a class='row-title' href='admin.php?page=accua_forms_list&amp;fid=".$item['ID']."'>".$item['title']."</a></strong>".$this->row_actions($actions);
+      }
+    }
    
 
    
@@ -91,7 +91,8 @@ class Accua_Forms_List_Table extends WP_List_Table {
             'cb' => '<input type="checkbox" />', //Render a checkbox instead of text
             'title' =>  __('Title', 'accua-form-api'),
             'ID' => 'ID',
-            'basic-shortcode' => __('Basic Shortcode', 'accua-form-api'),
+            'shortcode' => __('Shortcode', 'accua-form-api'),
+            'phpcode' => __('PHP code', 'accua-form-api'), 
             'submissions' => __('Submissions', 'accua-form-api'),
         );
         return $columns;
@@ -214,7 +215,8 @@ class Accua_Forms_List_Table extends WP_List_Table {
             'ID' => $id,
             'title' => $title,
             'submissions' => 0,
-            'basic-shortcode'=> '[accua-form fid="'.$id.'"]',
+            'shortcode'=> '[accua-form fid="'.$id.'"]',
+            'phpcode'=>"<?php accua_forms_include('$id'); ?>",
             'deleted' => $del,
           );
         }
@@ -233,7 +235,8 @@ class Accua_Forms_List_Table extends WP_List_Table {
               'ID' => $fsub->fid,
               'submissions' => $fsub->submissions,
               'deleted' => true,
-              'basic-shortcode'=> '[accua-form fid="'.$fsub->fid.'"]',
+              'shortcode' => '',
+              'phpcode' => '',
             );
             $this->del_items++;
           } else if (!isset($forms_data[$fsub->fid])) {

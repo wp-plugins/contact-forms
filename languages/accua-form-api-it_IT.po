@@ -47,8 +47,11 @@ msgstr "Titolo"
 
 #: D:\Accua
 #: 07_08\27_06_2013\accua-forms/accua-forms-list-page.php:89
-msgid "Basic Shortcode"
-msgstr "Shortcode base"
+msgid "Shortcode"
+msgstr "Shortcode"
+
+msgid "PHP code"
+msgstr "Codice PHP"
 
 #: D:\Accua
 #: 07_08\27_06_2013\accua-forms/accua-forms-list-page.php:90
@@ -687,7 +690,7 @@ msgstr "File da caricare"
 #: 07_08\27_06_2013\accua-forms/accua-forms.php:1498
 #, fuzzy
 msgid "Submit button"
-msgstr "Inviato"
+msgstr "Bottone di invio"
 
 #: D:\Accua
 #: 07_08\27_06_2013\accua-forms/accua-forms.php:1499
@@ -843,7 +846,7 @@ msgstr "4. Email di conferma a chi ha compilato "
 #: 07_08\27_06_2013\accua-forms/accua-forms.php:1764
 #: 07_08\27_06_2013\accua-forms/accua-forms.php:1792
 msgid "File upload default settings"
-msgstr ""
+msgstr "Impostazioni di default per l'upload di file"
 
 #: D:\Accua
 #: 07_08\27_06_2013\accua-forms/accua-forms.php:1766
@@ -994,3 +997,57 @@ msgstr "Esporta tutte le colonne su Excel"
 
 msgid "Use the orange %img_c button in the TinyMCE editor to include the forms in posts, pages or other content types (shortcode and php functions also available)"
 msgstr "Usa il bottone arancione %img_c nell'editor TinyMCE per includere i form in post, pagine o altri tipi di contenuto (sono disponibili anche shortcode e funzioni php)"
+
+msgid "Submissions from all forms"
+msgstr "Invii da tutti i form"
+
+msgid "No forms submitted"
+msgstr "Nessun form inviato"
+
+msgid "Default style"
+msgstr "Stile predefinito"
+
+msgid "Password"
+msgstr "Password"
+
+msgid "Confirm password"
+msgstr "Conferma password"
+
+msgid "Background color"
+msgstr "Colore di sfondo"
+
+msgid "Margin"
+msgstr "Margine"
+
+msgid "Border width"
+msgstr "Larghezza bordo"
+
+msgid "Border color"
+msgstr "Colore bordo"
+
+msgid "Padding"
+msgstr "Padding"
+
+msgid "Font size"
+msgstr "Dimensione carattere"
+
+msgid "Rounded corner radius"
+msgstr "Raggio degli angoli arrotondati"
+
+msgid "Text color"
+msgstr "Colore del testo"
+
+msgid "Spacing"
+msgstr "Spaziatura"
+
+msgid "Layout &amp; Styling"
+msgstr "Layout e stile"
+
+msgid "Customize the look and feel of your forms. Leave fields empty if you wish to use the native styles of your WordPress Theme."
+msgstr "Personalizza l'aspetto dei tuoi form. Lascia i campi vuoti per usare lo stile del tuo tema WordPress."
+
+msgid "The reCATPCHA response provided was incorrect.  Please re-try."
+msgstr "La risposta reCATPCHA non era corretta, Riprova."
+
+msgid "Submit"
+msgstr "Invia"

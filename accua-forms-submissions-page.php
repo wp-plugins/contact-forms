@@ -323,7 +323,7 @@ function accua_forms_submissions_list_page($head = false){
     width: 100%;
 }
 </style>
-    <div class="wrap">
+    <div id="accua_forms_submissions_list_page" class="accua_forms_admin_page wrap">
         
         <div id="icon-users" class="icon32"><br/></div>
 

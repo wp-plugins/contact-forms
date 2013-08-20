@@ -25,6 +25,7 @@ function accua_forms_menu(){
   
   $settings_page = add_submenu_page('accua_forms', __( 'Default Forms settings', 'accua-form-api'), __('Settings', 'accua-form-api'), 10, "accua_forms_settings", 'accua_forms_settings_page');
   add_action( 'admin_print_styles-'.$settings_page, 'accua_forms_edit_page_head_styles');
+  add_action( 'admin_print_scripts-'.$settings_page, 'accua_forms_settings_page_head_scripts');
   
   wp_enqueue_script('jquery-form');
   wp_enqueue_script('jquery-color');
@@ -58,7 +59,7 @@ function accua_forms_report_page_head(){
 
 function accua_forms_report_page() {
 ?>
-  <div class="wrap">
+  <div id="accua_forms_report_page" class="accua_forms_admin_page wrap">
     <h2>Forms submissions report</h2>
     
 <?php
@@ -150,7 +151,7 @@ jQuery(function($){
 
 function accua_forms_edit_page_head_styles() {
   wp_admin_css( 'widgets' );
-  wp_enqueue_style( 'accua-forms-admin', plugins_url('accua-forms-admin.css', __FILE__), array(), '1');
+  wp_enqueue_style( 'accua-forms-admin', plugins_url('accua-forms-admin.css', __FILE__), array('wp-color-picker'), '1');
 }
 
 function accua_forms_edit_page_head_scripts() {
@@ -159,7 +160,11 @@ function accua_forms_edit_page_head_scripts() {
   wp_enqueue_script('jquery-ui-draggable');
   wp_enqueue_script('jquery-ui-droppable');*/
   wp_enqueue_script( 'accua-form-fields', plugins_url( 'form-fields.js' , __FILE__ ), array( 'jquery-ui-sortable', 'jquery-ui-draggable', 'jquery-ui-droppable' ) );
-  wp_enqueue_script( 'accua-form-settings', plugins_url( 'form-settings.js' , __FILE__ ), array( 'jquery' ), '0.2.3');
+  wp_enqueue_script( 'accua-form-settings', plugins_url( 'form-settings.js' , __FILE__ ), array( 'jquery', 'wp-color-picker' ), '1.1');
+}
+
+function accua_forms_settings_page_head_scripts() {
+  wp_enqueue_script('wp-color-picker');
 }
 
 function accua_forms_edit_page_head() {
@@ -288,7 +293,6 @@ function accua_forms_save_form_settings() {
   
   $settings = array(
     'title',
-    'layout',
     'success_message',
     'success_message_no_message',
     'error_message',
@@ -302,8 +306,31 @@ function accua_forms_save_form_settings() {
     'confirmation_emails_subject',
     'confirmation_emails_message',
     'confirmation_emails_message_no_message',
-    
     //'use_ajax',
+    
+    'layout',
+    'style_margin',
+    'style_border_color',
+    'style_border_width',
+    'style_border_radius',
+    'style_background_color',
+    'style_padding',
+    'style_color',
+    'style_font_size',
+    'style_field_spacing',
+    'style_field_border_color',
+    'style_field_border_width',
+    'style_field_border_radius',
+    'style_field_background_color',
+    'style_field_padding',
+    'style_field_color',
+    'style_submit_border_color',
+    'style_submit_border_width',
+    'style_submit_border_radius',
+    'style_submit_background_color',
+    'style_submit_padding',
+    'style_submit_color',
+    'style_submit_font_size', 
   );
   
   // print_r($post);
@@ -581,7 +608,7 @@ function accua_forms_add_page($message='') {
   }
 ?>
 
-<div class="wrap">
+<div id="accua_forms_add_page" class="accua_forms_admin_page wrap">
 <h2><?php _e( 'Create a form', 'accua-form-api'); ?> </h2>
 <?php if ($message !== '') {
   echo "<div style='border:1px solid; padding: 10px;'>$message</div>";
@@ -684,7 +711,7 @@ function accua_forms_list_page() {
     }
   }
 ?>
-<div class="wrap">
+<div id="accua_forms_list_page" class="accua_forms_admin_page wrap">
 <?php if ($message !== '') {
   echo "<div style='border:1px solid; padding: 10px;'>$message</div>";
 } ?>
@@ -744,7 +771,7 @@ function accua_forms_edit_page($fid) {
   $adminurl = admin_url();
   
 ?>
-<div class="wrap" id="accua-forms-edit-form-page">
+<div id="accua_forms_edit_page" class="accua_forms_admin_page wrap">
 <div id="icon-contact-forms-cimatti-logo" class="icon32"></div>
 <h2><?php _e( 'Edit Form', 'accua-form-api'); ?></h2>
 <div id="titlediv"><br />
@@ -999,14 +1026,180 @@ accua_forms_saved_form_data: <?php echo htmlspecialchars(print_r($form_data, tru
 </div>
 
 <div id="accua_tab_preview" class="content_tab">
-<p id="accua_form_layout"><?php _e('Layout', 'accua-form-api'); ?> <select name="layout" class="accua_form_value">
-  <option value="" <?php if (isset($form_overrided_data['layout'])) { echo 'selected="selected"'; } ?>>default (<?php if($default_form_data['layout']=='sidebyside') _e( 'Labels on the left of the fields', 'accua-form-api'); else _e( 'Labels on top of the fields', 'accua-form-api'); ?>)</option><option value="sidebyside" <?php if ((isset($form_overrided_data['layout'])) && ($form_data['layout'] == 'sidebyside')) { echo 'selected="selected"'; } ?>><?php _e( 'Labels on the left of the fields', 'accua-form-api'); ?></option><option value="toplabel" <?php if ((isset($form_overrided_data['layout'])) && ($form_data['layout'] == 'toplabel')) { echo 'selected="selected"'; } ?>><?php _e( 'Labels on top of the fields', 'accua-form-api'); ?></option></select>
-</p>
-<p id="accua_form_use_ajax"><input class="accua_form_value" type="checkbox" value="1" <?php if (!empty($form_data['use_ajax'])) {echo 'checked="checked" ';} ?>/><?php _e( 'Use AJAX to avoid page reload when submitting form', 'accua-form-api'); ?></p>
+
 <p style="clear:both;"><?php _e( 'Preview is updated when you click on "Save settings" button', 'accua-form-api'); ?></p>
 <div id="accua_form_preview_area_wrapper">
 <iframe id="accua_form_preview_area" src="admin-ajax.php?action=accua_forms_preview&fid=<?php echo htmlspecialchars($fid,ENT_QUOTES);?>" ></iframe>
 </div>
+
+<p id="accua_form_use_ajax"><input class="accua_form_value" type="checkbox" value="1" <?php if (!empty($form_data['use_ajax'])) {echo 'checked="checked" ';} ?>/><?php _e( 'Use AJAX to avoid page reload when submitting form', 'accua-form-api'); ?></p>
+
+<h4><?php _e( 'Forms', 'accua-form-api'); ?></h4>
+
+<p id="accua_form_layout"><?php _e('Layout', 'accua-form-api'); ?> <select name="layout" class="accua_form_value">
+  <option value="" <?php if (isset($form_overrided_data['layout'])) { echo 'selected="selected"'; } ?>>default (<?php if($default_form_data['layout']=='sidebyside') _e( 'Labels on the left of the fields', 'accua-form-api'); else _e( 'Labels on top of the fields', 'accua-form-api'); ?>)</option><option value="sidebyside" <?php if ((isset($form_overrided_data['layout'])) && ($form_data['layout'] == 'sidebyside')) { echo 'selected="selected"'; } ?>><?php _e( 'Labels on the left of the fields', 'accua-form-api'); ?></option><option value="toplabel" <?php if ((isset($form_overrided_data['layout'])) && ($form_data['layout'] == 'toplabel')) { echo 'selected="selected"'; } ?>><?php _e( 'Labels on top of the fields', 'accua-form-api'); ?></option></select>
+</p>
+
+<div id="accua_form_style_margin" class="label_input">
+  <label><?php _e( 'Margin', 'accua-form-api'); ?></label>
+  <div class="default_value"><?php echo $default_form_data['style_margin']; ?></div>
+  <input class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_margin'], ENT_QUOTES) ?>" />
+  <input name="accua_form_style_margin" class="accua_form_check_override" type="checkbox" value="1" <?php if (isset($form_overrided_data['style_margin'])) {echo 'checked="checked" ';} ?>/><?php _e( 'Customize', 'accua-form-api'); ?> 
+</div>
+
+<div id="accua_form_style_border_color" class="label_input">
+  <label><?php _e( 'Border color', 'accua-form-api'); ?></label>
+  <div class="default_value"><?php echo $default_form_data['style_border_color']; ?></div>
+  <input class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_border_color'], ENT_QUOTES) ?>" />
+  <input name="accua_form_style_border_color" class="accua_form_check_override" type="checkbox" value="1" <?php if (isset($form_overrided_data['style_border_color'])) {echo 'checked="checked" ';} ?>/><?php _e( 'Customize', 'accua-form-api'); ?> 
+</div>
+
+<div id="accua_form_style_border_width" class="label_input">
+  <label><?php _e( 'Border width', 'accua-form-api'); ?></label>
+  <div class="default_value"><?php echo $default_form_data['style_border_width']; ?></div>
+  <input class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_border_width'], ENT_QUOTES) ?>" />
+  <input name="accua_form_style_border_width" class="accua_form_check_override" type="checkbox" value="1" <?php if (isset($form_overrided_data['style_border_width'])) {echo 'checked="checked" ';} ?>/><?php _e( 'Customize', 'accua-form-api'); ?> 
+</div>
+
+<div id="accua_form_style_border_radius" class="label_input">
+  <label><?php _e( 'Rounded corner radius', 'accua-form-api'); ?></label>
+  <div class="default_value"><?php echo $default_form_data['style_border_radius']; ?></div>
+  <input class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_border_radius'], ENT_QUOTES) ?>" />
+  <input name="accua_form_style_border_radius" class="accua_form_check_override" type="checkbox" value="1" <?php if (isset($form_overrided_data['style_border_radius'])) {echo 'checked="checked" ';} ?>/><?php _e( 'Customize', 'accua-form-api'); ?> 
+</div>
+
+<div id="accua_form_style_background_color" class="label_input">
+  <label><?php _e( 'Background color', 'accua-form-api'); ?></label>
+  <div class="default_value"><?php echo $default_form_data['style_background_color']; ?></div>
+  <input class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_background_color'], ENT_QUOTES) ?>" />
+  <input name="accua_form_style_background_color" class="accua_form_check_override" type="checkbox" value="1" <?php if (isset($form_overrided_data['style_background_color'])) {echo 'checked="checked" ';} ?>/><?php _e( 'Customize', 'accua-form-api'); ?> 
+</div>
+
+<div id="accua_form_style_padding" class="label_input">
+  <label><?php _e( 'Padding', 'accua-form-api'); ?></label>
+  <div class="default_value"><?php echo $default_form_data['style_padding']; ?></div>
+  <input class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_padding'], ENT_QUOTES) ?>" />
+  <input name="accua_form_style_padding" class="accua_form_check_override" type="checkbox" value="1" <?php if (isset($form_overrided_data['style_padding'])) {echo 'checked="checked" ';} ?>/><?php _e( 'Customize', 'accua-form-api'); ?> 
+</div>
+
+<div id="accua_form_style_color" class="label_input">
+  <label><?php _e( 'Text color', 'accua-form-api'); ?></label>
+  <div class="default_value"><?php echo $default_form_data['style_color']; ?></div>
+  <input class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_color'], ENT_QUOTES) ?>" />
+  <input name="accua_form_style_color" class="accua_form_check_override" type="checkbox" value="1" <?php if (isset($form_overrided_data['style_color'])) {echo 'checked="checked" ';} ?>/><?php _e( 'Customize', 'accua-form-api'); ?> 
+</div>
+
+<div id="accua_form_style_font_size" class="label_input">
+  <label><?php _e( 'Font size', 'accua-form-api'); ?></label>
+  <div class="default_value"><?php echo $default_form_data['style_font_size']; ?></div>
+  <input class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_font_size'], ENT_QUOTES) ?>" />
+  <input name="accua_form_style_font_size" class="accua_form_check_override" type="checkbox" value="1" <?php if (isset($form_overrided_data['style_font_size'])) {echo 'checked="checked" ';} ?>/><?php _e( 'Customize', 'accua-form-api'); ?> 
+</div>
+
+<h4><?php _e( 'Fields', 'accua-form-api'); ?></h4>
+
+<div id="accua_form_style_field_spacing" class="label_input">
+  <label><?php _e( 'Spacing', 'accua-form-api'); ?></label>
+  <div class="default_value"><?php echo $default_form_data['style_field_spacing']; ?></div>
+  <input class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_field_spacing'], ENT_QUOTES) ?>" />
+  <input name="accua_form_style_field_spacing" class="accua_form_check_override" type="checkbox" value="1" <?php if (isset($form_overrided_data['style_field_spacing'])) {echo 'checked="checked" ';} ?>/><?php _e( 'Customize', 'accua-form-api'); ?> 
+</div>
+
+<div id="accua_form_style_field_border_color" class="label_input">
+  <label><?php _e( 'Border color', 'accua-form-api'); ?></label>
+  <div class="default_value"><?php echo $default_form_data['style_field_border_color']; ?></div>
+  <input class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_field_border_color'], ENT_QUOTES) ?>" />
+  <input name="accua_form_style_field_border_color" class="accua_form_check_override" type="checkbox" value="1" <?php if (isset($form_overrided_data['style_field_border_color'])) {echo 'checked="checked" ';} ?>/><?php _e( 'Customize', 'accua-form-api'); ?> 
+</div>
+
+<div id="accua_form_style_field_border_width" class="label_input">
+  <label><?php _e( 'Border width', 'accua-form-api'); ?></label>
+  <div class="default_value"><?php echo $default_form_data['style_field_border_width']; ?></div>
+  <input class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_field_border_width'], ENT_QUOTES) ?>" />
+  <input name="accua_form_style_field_border_width" class="accua_form_check_override" type="checkbox" value="1" <?php if (isset($form_overrided_data['style_field_border_width'])) {echo 'checked="checked" ';} ?>/><?php _e( 'Customize', 'accua-form-api'); ?> 
+</div>
+
+<div id="accua_form_style_field_border_radius" class="label_input">
+  <label><?php _e( 'Rounded corner radius', 'accua-form-api'); ?></label>
+  <div class="default_value"><?php echo $default_form_data['style_field_border_radius']; ?></div>
+  <input class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_field_border_radius'], ENT_QUOTES) ?>" />
+  <input name="accua_form_style_field_border_radius" class="accua_form_check_override" type="checkbox" value="1" <?php if (isset($form_overrided_data['style_field_border_radius'])) {echo 'checked="checked" ';} ?>/><?php _e( 'Customize', 'accua-form-api'); ?> 
+</div>
+
+<div id="accua_form_style_field_background_color" class="label_input">
+  <label><?php _e( 'Background color', 'accua-form-api'); ?></label>
+  <div class="default_value"><?php echo $default_form_data['style_field_background_color']; ?></div>
+  <input class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_field_background_color'], ENT_QUOTES) ?>" />
+  <input name="accua_form_style_field_background_color" class="accua_form_check_override" type="checkbox" value="1" <?php if (isset($form_overrided_data['style_field_background_color'])) {echo 'checked="checked" ';} ?>/><?php _e( 'Customize', 'accua-form-api'); ?> 
+</div>
+
+<div id="accua_form_style_field_padding" class="label_input">
+  <label><?php _e( 'Padding', 'accua-form-api'); ?></label>
+  <div class="default_value"><?php echo $default_form_data['style_field_padding']; ?></div>
+  <input class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_field_padding'], ENT_QUOTES) ?>" />
+  <input name="accua_form_style_field_padding" class="accua_form_check_override" type="checkbox" value="1" <?php if (isset($form_overrided_data['style_field_padding'])) {echo 'checked="checked" ';} ?>/><?php _e( 'Customize', 'accua-form-api'); ?> 
+</div>
+
+<div id="accua_form_style_field_color" class="label_input">
+  <label><?php _e( 'Text color', 'accua-form-api'); ?></label>
+  <div class="default_value"><?php echo $default_form_data['style_field_color']; ?></div>
+  <input class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_field_color'], ENT_QUOTES) ?>" />
+  <input name="accua_form_style_field_color" class="accua_form_check_override" type="checkbox" value="1" <?php if (isset($form_overrided_data['style_field_color'])) {echo 'checked="checked" ';} ?>/><?php _e( 'Customize', 'accua-form-api'); ?> 
+</div>
+
+
+<h4><?php _e( 'Submit button', 'accua-form-api'); ?></h4>
+
+<div id="accua_form_style_submit_border_color" class="label_input">
+  <label><?php _e( 'Border color', 'accua-form-api'); ?></label>
+  <div class="default_value"><?php echo $default_form_data['style_submit_border_color']; ?></div>
+  <input class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_submit_border_color'], ENT_QUOTES) ?>" />
+  <input name="accua_form_style_submit_border_color" class="accua_form_check_override" type="checkbox" value="1" <?php if (isset($form_overrided_data['style_submit_border_color'])) {echo 'checked="checked" ';} ?>/><?php _e( 'Customize', 'accua-form-api'); ?> 
+</div>
+
+<div id="accua_form_style_submit_border_width" class="label_input">
+  <label><?php _e( 'Border width', 'accua-form-api'); ?></label>
+  <div class="default_value"><?php echo $default_form_data['style_submit_border_width']; ?></div>
+  <input class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_submit_border_width'], ENT_QUOTES) ?>" />
+  <input name="accua_form_style_submit_border_width" class="accua_form_check_override" type="checkbox" value="1" <?php if (isset($form_overrided_data['style_submit_border_width'])) {echo 'checked="checked" ';} ?>/><?php _e( 'Customize', 'accua-form-api'); ?> 
+</div>
+
+<div id="accua_form_style_submit_border_radius" class="label_input">
+  <label><?php _e( 'Rounded corner radius', 'accua-form-api'); ?></label>
+  <div class="default_value"><?php echo $default_form_data['style_submit_border_radius']; ?></div>
+  <input class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_submit_border_radius'], ENT_QUOTES) ?>" />
+  <input name="accua_form_style_submit_border_radius" class="accua_form_check_override" type="checkbox" value="1" <?php if (isset($form_overrided_data['style_submit_border_radius'])) {echo 'checked="checked" ';} ?>/><?php _e( 'Customize', 'accua-form-api'); ?> 
+</div>
+
+<div id="accua_form_style_submit_background_color" class="label_input">
+  <label><?php _e( 'Background color', 'accua-form-api'); ?></label>
+  <div class="default_value"><?php echo $default_form_data['style_submit_background_color']; ?></div>
+  <input class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_submit_background_color'], ENT_QUOTES) ?>" />
+  <input name="accua_form_style_submit_background_color" class="accua_form_check_override" type="checkbox" value="1" <?php if (isset($form_overrided_data['style_submit_background_color'])) {echo 'checked="checked" ';} ?>/><?php _e( 'Customize', 'accua-form-api'); ?> 
+</div>
+
+<div id="accua_form_style_submit_padding" class="label_input">
+  <label><?php _e( 'Padding', 'accua-form-api'); ?></label>
+  <div class="default_value"><?php echo $default_form_data['style_submit_padding']; ?></div>
+  <input class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_submit_padding'], ENT_QUOTES) ?>" />
+  <input name="accua_form_style_submit_padding" class="accua_form_check_override" type="checkbox" value="1" <?php if (isset($form_overrided_data['style_submit_padding'])) {echo 'checked="checked" ';} ?>/><?php _e( 'Customize', 'accua-form-api'); ?> 
+</div>
+
+<div id="accua_form_style_submit_color" class="label_input">
+  <label><?php _e( 'Text color', 'accua-form-api'); ?></label>
+  <div class="default_value"><?php echo $default_form_data['style_submit_color']; ?></div>
+  <input class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_submit_color'], ENT_QUOTES) ?>" />
+  <input name="accua_form_style_submit_color" class="accua_form_check_override" type="checkbox" value="1" <?php if (isset($form_overrided_data['style_submit_color'])) {echo 'checked="checked" ';} ?>/><?php _e( 'Customize', 'accua-form-api'); ?> 
+</div>
+
+<div id="accua_form_style_submit_font_size" class="label_input">
+  <label><?php _e( 'Font size', 'accua-form-api'); ?></label>
+  <div class="default_value"><?php echo $default_form_data['style_submit_font_size']; ?></div>
+  <input class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_submit_font_size'], ENT_QUOTES) ?>" />
+  <input name="accua_form_style_submit_font_size" class="accua_form_check_override" type="checkbox" value="1" <?php if (isset($form_overrided_data['style_submit_font_size'])) {echo 'checked="checked" ';} ?>/><?php _e( 'Customize', 'accua-form-api'); ?> 
+</div>
+
+
 </div>
 <p></p>
 <input  class="button button-primary button-large accua_form_save_settings_button" id="accua_form_save_settings_2" type="button" value="<?php _e( 'Save settings', 'accua-form-api'); ?>" /> <span class="accua_form_save_settings_status"></span>
@@ -1032,11 +1225,11 @@ jQuery('input[type=checkbox]').click(function() {
   var name = jQuery(this).attr('name');
   if (!this.checked) {     
     jQuery('#'+name+' .default_value').show();
-    jQuery('#'+name+' .accua_form_value').hide();
+    jQuery('#'+name+' .accua_form_value, #'+name+' .wp-picker-container').hide();
   }
   else {
     jQuery('#'+name+' .default_value').hide();
-    jQuery('#'+name+' .accua_form_value').show();   
+    jQuery('#'+name+' .accua_form_value, #'+name+' .wp-picker-container').show();   
   }
 });
 
@@ -1071,15 +1264,15 @@ jQuery(document).ready(function($){
        }
   ); 
   $.each(
-      ['emails_from','admin_emails_to','emails_bcc','admin_emails_subject','confirmation_emails_subject'],
+      ['emails_from','admin_emails_to','emails_bcc','admin_emails_subject','confirmation_emails_subject','style_margin','style_border_color','style_border_width','style_border_radius','style_background_color','style_padding','style_color','style_font_size','style_field_spacing','style_field_border_color','style_field_border_width','style_field_border_radius','style_field_background_color','style_field_padding','style_field_color','style_submit_border_color','style_submit_border_width','style_submit_border_radius','style_submit_background_color','style_submit_padding','style_submit_color','style_submit_font_size'],
       function(i,key){
         if(!$('#accua_form_'+key+' .accua_form_check_override').is(':checked')) {
           jQuery('#accua_form_'+key+' .default_value').show();
-          jQuery('#accua_form_'+key+' .accua_form_value').hide();
+          jQuery('#accua_form_'+key+' .accua_form_value, #accua_form_'+key+' .wp-picker-container').hide();
         }
         else {
           jQuery('#accua_form_'+key+' .default_value').hide();
-          jQuery('#accua_form_'+key+' .accua_form_value').show();
+          jQuery('#accua_form_'+key+' .accua_form_value, #accua_form_'+key+' .wp-picker-container').show();
         }
   });
   $("#dialog_token").dialog({ dialogClass:'wp-dialog' ,autoOpen : false, modal : true, show : "blind", hide : "blind"});
@@ -1317,7 +1510,7 @@ function accua_forms_fields_page() {
   }
   
 ?>
-<div class="wrap nosubsub">
+<div id="accua_forms_fields_page" class="accua_forms_admin_page wrap nosubsub">
 <div id="icon-contact-forms-cimatti-logo" class="icon32"></div>
 <h2><?php _e( 'Form fields', 'accua-form-api'); ?></h2>
 <?php /* screen_icon(); ?>
@@ -1586,12 +1779,11 @@ do_action($taxonomy . '_add_form', $taxonomy);
 
 function accua_forms_settings_page() {
 ?>
-<div class="wrap">
+<div id="accua_forms_settings_page" class="accua_forms_admin_page wrap">
 <div id="icon-contact-forms-cimatti-logo" class="icon32"></div>
 <h2><?php _e( 'Default Form settings', 'accua-form-api'); ?></h2>
 <?php
   $empty_form_data = array(
-    'layout' => 'sidebyside',
     'success_message' => '',
     'error_message' => '',
     'emails_from' => '',
@@ -1601,6 +1793,29 @@ function accua_forms_settings_page() {
     'admin_emails_message' => '',
     'confirmation_emails_subject' => '',
     'confirmation_emails_message' => '',
+    'layout' => 'sidebyside',
+    'style_margin' => '',
+    'style_border_color' => '',
+    'style_border_width' => '',
+    'style_border_radius' => '',
+    'style_background_color' => '',
+    'style_padding' => '',
+    'style_color' => '',
+    'style_font_size' => '',
+    'style_field_spacing' => '',
+    'style_field_border_color' => '',
+    'style_field_border_width' => '',
+    'style_field_border_radius' => '',
+    'style_field_background_color' => '',
+    'style_field_padding' => '',
+    'style_field_color' => '',
+    'style_submit_border_color' => '',
+    'style_submit_border_width' => '',
+    'style_submit_border_radius' => '',
+    'style_submit_background_color' => '',
+    'style_submit_padding' => '',
+    'style_submit_color' => '',
+    'style_submit_font_size' => '',
   );
   
   $empty_file_data = array(
@@ -1633,7 +1848,7 @@ function accua_forms_settings_page() {
 ?>
 <form method="post">
 <input type="hidden" name="accua_form_save_form_settings" value="1" />
-<!-- 
+<?php /*
 <p id="accua_form_layout"><?php _e( 'Layout', 'accua-form-api'); ?>: <select name="layout" class="accua_form_value"><option value="sidebyside" <?php if ($form_data['layout'] == 'sidebyside') { echo 'selected="selected"'; } ?>>Labels on the left of the fields</option><option value="toplabel" <?php if ($form_data['layout'] == 'toplabel') { echo 'selected="selected"'; } ?>>Labels on top of the fields</option></select></p>
 <p id="accua_form_success_message"><?php _e( 'Success message', 'accua-form-api'); ?>:<br /><textarea name="success_message" class="accua_form_value" style="width:95%"; cols="80" rows="8"><?php echo htmlspecialchars($form_data['success_message'], ENT_QUOTES) ?></textarea></p>
 <p id="accua_form_error_message"><?php _e( 'Error message', 'accua-form-api'); ?>:<br /><textarea name="error_message" class="accua_form_value" style="width:95%"; cols="80" rows="8"><?php echo htmlspecialchars($form_data['error_message'], ENT_QUOTES) ?></textarea></p>
@@ -1644,13 +1859,8 @@ function accua_forms_settings_page() {
 <p id="accua_form_admin_emails_message"><?php _e( 'Admin email message', 'accua-form-api'); ?>:<br /><textarea name="admin_emails_message" class="accua_form_value" style="width:95%"; cols="80" rows="8"><?php echo htmlspecialchars($form_data['admin_emails_message'], ENT_QUOTES) ?></textarea></p>
 <p id="accua_form_confirmation_emails_subject"><?php _e( 'Confirmation email subject', 'accua-form-api'); ?>: <input name="confirmation_emails_subject" class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['confirmation_emails_subject'], ENT_QUOTES) ?>" /></p>
 <p id="accua_form_confirmation_emails_message"><?php _e( 'Confirmation email message', 'accua-form-api'); ?>:<br /><textarea name="confirmation_emails_message" class="accua_form_value" style="width:95%"; cols="80" rows="8"><?php echo htmlspecialchars($form_data['confirmation_emails_message'], ENT_QUOTES) ?></textarea></p>
--->
+*/ ?>
 <div id="accua_tab_messages" class="content_tab">
-  <div id="accua_form_layout">
-    <?php _e( 'Layout', 'accua-form-api'); ?> 
-      <select name="layout" class="accua_form_value"><option value="sidebyside" <?php if ($form_data['layout'] == 'sidebyside') { echo 'selected="selected"'; } ?>>Labels on the left of the fields</option><option value="toplabel" <?php if ($form_data['layout'] == 'toplabel') { echo 'selected="selected"'; } ?>>Labels on top of the fields</option></select>
-  </div>
-  <br clear="all"/>
  <?php
   $settings_editor = array(
     'teeny' => true,
@@ -1754,11 +1964,119 @@ function accua_forms_settings_page() {
       </div>
     </div>
    </div>
-    <br clear="all"/>
+   
+   <div class="metabox-holder accua-forms-metabox-holder">
+      <div class="postbox ">
+        <h3 class="hndle"><span><?php _e( 'Layout &amp; Styling', 'accua-form-api'); ?></span></h3>
+        <div class="inside" id="dashboard_right_now">
+          <p><?php _e( 'Customize the look and feel of your forms. Leave fields empty if you wish to use the native styles of your WordPress Theme.', 'accua-form-api'); ?><p>
+          <h4><?php _e( 'Forms', 'accua-form-api'); ?></h4>
+          <div id="accua_form_layout"> <?php _e( 'Layout', 'accua-form-api'); ?> 
+            <select name="layout" class="accua_form_value"><option value="sidebyside" <?php if ($form_data['layout'] == 'sidebyside') { echo 'selected="selected"'; } ?>>Labels on the left of the fields</option><option value="toplabel" <?php if ($form_data['layout'] == 'toplabel') { echo 'selected="selected"'; } ?>>Labels on top of the fields</option></select>
+          </div>
+          <div id="accua_form_style_margin" class="label_input">
+            <label><?php _e( 'Margin', 'accua-form-api'); ?></label>
+            <input name="style_margin" class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_margin'], ENT_QUOTES) ?>" />
+          </div>
+          <div id="accua_form_style_border_color" class="label_input">
+            <label><?php _e( 'Border color', 'accua-form-api'); ?></label>
+            <input name="style_border_color" class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_border_color'], ENT_QUOTES) ?>" />
+          </div>
+          <div id="accua_form_style_border_width" class="label_input">
+            <label><?php _e( 'Border width', 'accua-form-api'); ?></label>
+            <input name="style_border_width" class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_border_width'], ENT_QUOTES) ?>" />
+          </div>
+          <div id="accua_form_style_border_radius" class="label_input">
+            <label><?php _e( 'Rounded corner radius', 'accua-form-api'); ?></label>
+            <input name="style_border_radius" class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_border_radius'], ENT_QUOTES) ?>" />
+          </div>
+          <div id="accua_form_style_background_color" class="label_input">
+            <label><?php _e( 'Background color', 'accua-form-api'); ?></label>
+            <input name="style_background_color" class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_background_color'], ENT_QUOTES) ?>" />
+          </div>
+          <div id="accua_form_style_padding" class="label_input">
+            <label><?php _e( 'Padding', 'accua-form-api'); ?></label>
+            <input name="style_padding" class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_padding'], ENT_QUOTES) ?>" />
+          </div>
+          <div id="accua_form_style_color" class="label_input">
+            <label><?php _e( 'Text color', 'accua-form-api'); ?></label>
+            <input name="style_color" class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_color'], ENT_QUOTES) ?>" />
+          </div>
+          <div id="accua_form_style_font_size" class="label_input">
+            <label><?php _e( 'Font size', 'accua-form-api'); ?></label>
+            <input name="style_font_size" class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_font_size'], ENT_QUOTES) ?>" />
+          </div>
+          
+          <h4><?php _e( 'Fields', 'accua-form-api'); ?></h4>
+          <div id="accua_form_style_field_spacing" class="label_input">
+            <label><?php _e( 'Spacing', 'accua-form-api'); ?></label>
+            <input name="style_field_spacing" class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_field_spacing'], ENT_QUOTES) ?>" />
+          </div>
+          <div id="accua_form_style_field_border_color" class="label_input">
+            <label><?php _e( 'Border color', 'accua-form-api'); ?></label>
+            <input name="style_field_border_color" class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_field_border_color'], ENT_QUOTES) ?>" />
+          </div>
+          <div id="accua_form_style_field_border_width" class="label_input">
+            <label><?php _e( 'Border width', 'accua-form-api'); ?></label>
+            <input name="style_field_border_width" class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_field_border_width'], ENT_QUOTES) ?>" />
+          </div>
+          <div id="accua_form_style_field_border_radius" class="label_input">
+            <label><?php _e( 'Rounded corner radius', 'accua-form-api'); ?></label>
+            <input name="style_field_border_radius" class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_field_border_radius'], ENT_QUOTES) ?>" />
+          </div>
+          <div id="accua_form_style_field_background_color" class="label_input">
+            <label><?php _e( 'Background color', 'accua-form-api'); ?></label>
+            <input name="style_field_background_color" class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_field_background_color'], ENT_QUOTES) ?>" />
+          </div>
+          <div id="accua_form_style_field_padding" class="label_input">
+            <label><?php _e( 'Padding', 'accua-form-api'); ?></label>
+            <input name="style_field_padding" class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_field_padding'], ENT_QUOTES) ?>" />
+          </div>
+          <div id="accua_form_style_field_color" class="label_input">
+            <label><?php _e( 'Text color', 'accua-form-api'); ?></label>
+            <input name="style_field_color" class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_field_color'], ENT_QUOTES) ?>" />
+          </div>
+          
+          <h4><?php _e( 'Submit button', 'accua-form-api'); ?></h4>
+          <div id="accua_form_style_submit_border_color" class="label_input">
+            <label><?php _e( 'Border color', 'accua-form-api'); ?></label>
+            <input name="style_submit_border_color" class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_submit_border_color'], ENT_QUOTES) ?>" />
+          </div>
+          <div id="accua_form_style_submit_border_width" class="label_input">
+            <label><?php _e( 'Border width', 'accua-form-api'); ?></label>
+            <input name="style_submit_border_width" class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_submit_border_width'], ENT_QUOTES) ?>" />
+          </div>
+          <div id="accua_form_style_submit_border_radius" class="label_input">
+            <label><?php _e( 'Rounded corner radius', 'accua-form-api'); ?></label>
+            <input name="style_submit_border_radius" class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_submit_border_radius'], ENT_QUOTES) ?>" />
+          </div>
+          <div id="accua_form_style_submit_background_color" class="label_input">
+            <label><?php _e( 'Background color', 'accua-form-api'); ?></label>
+            <input name="style_submit_background_color" class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_submit_background_color'], ENT_QUOTES) ?>" />
+          </div>
+          <div id="accua_form_style_submit_padding" class="label_input">
+            <label><?php _e( 'Padding', 'accua-form-api'); ?></label>
+            <input name="style_submit_padding" class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_submit_padding'], ENT_QUOTES) ?>" />
+          </div>
+          <div id="accua_form_style_submit_color" class="label_input">
+            <label><?php _e( 'Text color', 'accua-form-api'); ?></label>
+            <input name="style_submit_color" class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_submit_color'], ENT_QUOTES) ?>" />
+          </div>
+          <div id="accua_form_style_submit_font_size" class="label_input">
+            <label><?php _e( 'Font size', 'accua-form-api'); ?></label>
+            <input name="style_submit_font_size" class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['style_submit_font_size'], ENT_QUOTES) ?>" />
+          </div>
+          <br clear="all" />
+      </div>
+    </div>
+   </div>
+   
+   
+   <br clear="all"/>
    
 </div>
 
-<!--
+<?php /*
 <h3><?php _e( 'File upload default settings', 'accua-form-api'); ?></h3>
 <p id="accua_form_valid_extensions"><?php _e( 'Valid extensions', 'accua-form-api'); ?> <br /><textarea name="valid_extensions" class="accua_form_value" style="width:95%"; cols="80" rows="8"><?php echo htmlspecialchars($file_data['valid_extensions'], ENT_QUOTES) ?></textarea>
   <small><?php _e( 'List of valid extensions, without dot, one per line.', 'accua-form-api'); ?></small>
@@ -1776,10 +2094,25 @@ function accua_forms_settings_page() {
   </small></p>
 <p id="accua_form_dest_path"><?php _e( 'Upload path', 'accua-form-api');?> : <input name="dest_path" class="accua_form_value" type="text" value="<?php echo htmlspecialchars($file_data['dest_path'], ENT_QUOTES) ?>" />
   <small><?php _e( 'If it stars with \'/\' an absolute path is used, otherwise a path relative to the WordPress installation directory. Default value is "wp-content/uploads/accua-forms"', 'accua-form-api');?>.</small>
-</p> -->
+</p> */ ?>
 <p><input class="button button-primary button-large" id="accua_form_save_settings" type="submit" value="Save settings" /></p>
 </form>
 </div>
+
+<script type='text/javascript'>  
+jQuery(function($) {  
+  $('#accua_form_style_border_color .accua_form_value').wpColorPicker();
+  $('#accua_form_style_background_color .accua_form_value').wpColorPicker();
+  $('#accua_form_style_color .accua_form_value').wpColorPicker();
+  $('#accua_form_style_field_border_color .accua_form_value').wpColorPicker();
+  $('#accua_form_style_field_background_color .accua_form_value').wpColorPicker();
+  $('#accua_form_style_field_color .accua_form_value').wpColorPicker();
+  $('#accua_form_style_submit_border_color .accua_form_value').wpColorPicker();
+  $('#accua_form_style_submit_background_color .accua_form_value').wpColorPicker();
+  $('#accua_form_style_submit_color .accua_form_value').wpColorPicker();
+});  
+</script>  
+
 <?php
 }
 
@@ -1797,7 +2130,6 @@ function _accua_forms_get_form_data($fid = false, $return_empty = true, $restore
   $empty_form_data = array(
     'fields' => array(),
     'title' => '',
-    'layout' => 'sidebyside',
     'success_message' => '',
     'error_message' => '',
     'emails_from' => '',
@@ -1808,6 +2140,29 @@ function _accua_forms_get_form_data($fid = false, $return_empty = true, $restore
     'confirmation_emails_subject' => '',
     'confirmation_emails_message' => '',
     'use_ajax' => true,
+    'layout' => 'sidebyside',
+    'style_margin' => '',
+    'style_border_color' => '',
+    'style_border_width' => '',
+    'style_border_radius' => '',
+    'style_background_color' => '',
+    'style_padding' => '',
+    'style_color' => '',
+    'style_font_size' => '',
+    'style_field_spacing' => '',
+    'style_field_border_color' => '',
+    'style_field_border_width' => '',
+    'style_field_border_radius' => '',
+    'style_field_background_color' => '',
+    'style_field_padding' => '',
+    'style_field_color' => '',
+    'style_submit_border_color' => '',
+    'style_submit_border_width' => '',
+    'style_submit_border_radius' => '',
+    'style_submit_background_color' => '',
+    'style_submit_padding' => '',
+    'style_submit_color' => '',
+    'style_submit_font_size' => '',
   );
   
   if ($fid === false) {
@@ -1853,6 +2208,24 @@ function _accua_forms_get_form_data($fid = false, $return_empty = true, $restore
   
 }
 
+function _accua_forms_style_parameters($params) {
+  $ret = '';
+  foreach ($params as $key => $value) {
+    $value = trim($value);
+    if ($value !== '') {
+      if (is_numeric($value)) {
+        $ret .= "{$key}:{$value}px;";
+      } else {
+        $ret .= "{$key}:{$value};";
+      }
+      if ($key == 'border-width') {
+        $ret .= "border-style:solid;";
+      }
+    }
+  }
+  return $ret;
+}
+
 add_action('accua_form_alter', 'accua_forms_form_generate', -999, 2);
 function accua_forms_form_generate($baseid, $form) {
   if (substr($baseid, 0, 14) == '__accua-form__') {
@@ -1866,6 +2239,50 @@ function accua_forms_form_generate($baseid, $form) {
     echo "\n-->";
     */
     if ($form_data) {
+      $form_style = _accua_forms_style_parameters(array(
+        'margin' => $form_data['style_margin'],
+        'border-color' => $form_data['style_border_color'],
+        'border-width' => $form_data['style_border_width'],
+        'border-radius' => $form_data['style_border_radius'],
+        'background' => $form_data['style_background_color'],
+        'padding' => $form_data['style_padding'],
+        'color' => $form_data['style_color'],
+        'font-size' => $form_data['style_font_size'],
+      ));
+
+      $field_style = _accua_forms_style_parameters(array(
+        'margin-bottom' => $form_data['style_field_spacing'],
+        'border-color' => $form_data['style_field_border_color'],
+        'border-width' => $form_data['style_field_border_width'],
+        'border-radius' => $form_data['style_field_border_radius'],
+        'background' => (trim($form_data['style_field_background_color']) === '')?'transparent':$form_data['style_field_background_color'],
+        'padding' => $form_data['style_field_padding'],
+        'color' => (trim($form_data['style_field_color']) === '')?$form_data['style_color']:$form_data['style_field_color'],
+        'font-size' => $form_data['style_font_size'],
+      ));
+      $field_properties = array();
+      if ($field_style !== '') {
+        $field_properties['style'] = $field_style;
+      }
+
+      $submit_style = _accua_forms_style_parameters(array(
+        'border-color' => $form_data['style_submit_border_color'],
+        'border-width' => $form_data['style_submit_border_width'],
+        'border-radius' => $form_data['style_submit_border_radius'],
+        'background' => $form_data['style_submit_background_color'],
+        'padding' => $form_data['style_submit_padding'],
+        'color' => $form_data['style_submit_color'],
+        'font-size' => $form_data['style_submit_font_size'],
+      ));
+      $submit_properties = array();
+      if ($submit_style !== '') {
+        $submit_properties['style'] = $submit_style;
+      }
+
+      if ($form_style !== '') {
+        $form->configure(array('style' => $form_style));
+      }
+      
       if (!empty($form_data['use_ajax'])){
         $form->configure(array(
           "accua_ajax" => 1,
@@ -1949,7 +2366,7 @@ function accua_forms_form_generate($baseid, $form) {
         
         switch ($field_data['type']) {
           case 'textarea':
-            $element = new Element_Textarea($istance_data['label'], $istance_data['istance_id'], array('cols' => '50'));
+            $element = new Element_Textarea($istance_data['label'], $istance_data['istance_id'], $field_properties+array('cols' => '50'));
           break;
           case 'hidden':
             $element = new Element_Hidden($istance_data['istance_id'], $istance_data['default_value']);
@@ -1966,13 +2383,13 @@ function accua_forms_form_generate($baseid, $form) {
             if (!isset($allowed_values[''])) {
               $allowed_values = array('' => '') + $allowed_values;
             }
-            $element = new Element_Select($istance_data['label'], $istance_data['istance_id'], $allowed_values);
+            $element = new Element_Select($istance_data['label'], $istance_data['istance_id'], $allowed_values, $field_properties);
           break;
           case 'radio':
-            $element = new Element_Radio($istance_data['label'], $istance_data['istance_id'], $allowed_values);
+            $element = new AccuaForm_Element_Radio($istance_data['label'], $istance_data['istance_id'], $allowed_values);
           break;
           case 'multiselect':
-            $element = new Element_Select($istance_data['label'], $istance_data['istance_id'], $allowed_values, array('multiple' => true));
+            $element = new Element_Select($istance_data['label'], $istance_data['istance_id'], $allowed_values, $field_properties+array('multiple' => true));
           break;
           case 'multicheckbox':
             $element = new AccuaForm_Element_Checkbox($istance_data['label'], $istance_data['istance_id'], $allowed_values);
@@ -1992,14 +2409,14 @@ function accua_forms_form_generate($baseid, $form) {
             
             $fdata['destPath'] = _accua_forms_get_abs_dest_path($filedata['dest_path']);
             
-            $element = new AccuaForm_Element_File($istance_data['label'], $istance_data['istance_id'], $fdata);
+            $element = new AccuaForm_Element_File($istance_data['label'], $istance_data['istance_id'], $field_properties+$fdata);
           break;
           case 'html':
             $element = new Element_HTML($istance_data['default_value']);
           break;
           case 'email':
           case 'autoreply_email':
-            $element = new AccuaForm_Element_Email($istance_data['label'], $istance_data['istance_id']);
+            $element = new AccuaForm_Element_Email($istance_data['label'], $istance_data['istance_id'], $field_properties);
             $element->setValidation(new Validation_Email(
               str_replace('%element%', $istance_data['label'], __("Attention: '%element%' must contain an email address.", 'accua-form-api'))
               ));
@@ -2007,25 +2424,23 @@ function accua_forms_form_generate($baseid, $form) {
           break;
           case 'submit':
             $add_submit = false;
-            $element = new Element_Button($istance_data['label'], 'submit', array('name' => $istance_data['istance_id'], 'value' => $istance_data['default_value']));
+            $element = new Element_Button($istance_data['label'], 'submit', $submit_properties+array('name' => $istance_data['istance_id'], 'value' => $istance_data['default_value']));
           break;
           case 'captcha':
-            $element = new Element_Captcha ($istance_data['label'], array("description" => ""));
+            $element = new AccuaForm_Element_Captcha ($istance_data['label'], array("description" => ""));
           break;
 		      case 'password':
-            $element = new Element_Password($istance_data['label'], $istance_data['istance_id']);
+            $element = new Element_Password($istance_data['label'], $istance_data['istance_id'], $field_properties);
 			    break;
 		      case 'password-and-confirm':
-			    $id_2 = "___".$istance_data['istance_id']."___confirmpass";
-            $element = new Element_Password("Password", $istance_data['istance_id']);
-			      $element_conf = new Element_Password("Conferma password", $id_2);
-            $element_conf->setValidation(new AccuaForm_Validation_Password(
-					    str_replace('%element%', "Conferma password", __("Attention: '%element%' is a required field.", 'accua-form-api'))
-				    )); 
+			      $id_2 = "___{$istance_data['istance_id']}___confirmpass";
+            $element = new Element_Password(__("Password", 'accua-form-api'), $istance_data['istance_id'], $field_properties);
+			      $element_conf = new Element_Password(__("Confirm password", 'accua-form-api'), $id_2, $field_properties);
+            $element_conf->setValidation(new AccuaForm_Validation_Password()); 
           break;
-          case 'textfield':
+          //case 'textfield':
           default:
-            $element = new Element_Textbox($istance_data['label'], $istance_data['istance_id']);
+            $element = new Element_Textbox($istance_data['label'], $istance_data['istance_id'], $field_properties);
           break;
         }
         
@@ -2058,7 +2473,7 @@ function accua_forms_form_generate($baseid, $form) {
       }
       
       if ($add_submit) {
-        $form->addElement(new Element_Button);
+        $form->addElement(new Element_Button(__('Submit', 'accua-form-api'), 'submit', $submit_properties));
       }
     }
     
@@ -2088,6 +2503,18 @@ function accua_forms_aggregate_submitted_data(&$replace_map, $params = array()) 
     $replace_map['__autoreply_email'] = implode('; ', $replace_map['__autoreply_email_raw']);
   }
   
+}
+
+add_filter('accua_form_validate', 'accua_forms_validation_handler', 10, 4);
+function accua_forms_validation_handler($valid, $submittedID, $submittedData, $form){
+  if (substr($submittedID, 0, 14) == '__accua-form__') {
+    $fid = substr($submittedID,14);
+    $form_data = _accua_forms_get_form_data($fid, false);
+    if ($form_data) {
+      return apply_filters('accua_forms_validation', $valid, $fid, $submittedData, $form);
+    }
+  }
+  return $valid;
 }
 
 add_action('accua_form_submit', 'accua_forms_form_submission_handler', -10, 3);
@@ -2308,7 +2735,11 @@ function accua_forms_form_submission_handler($submittedID, $submittedData, $form
 
       accua_forms_aggregate_submitted_data($replace_map);
       
+      //Older undocumented filter, maintained for backward compatibility. In fact filter accua_forms_form_submission_handler is called before accua_forms_submission, but for the rest they are the same
       $replace_map = apply_filters('accua_forms_form_submission_handler', $replace_map, $fid, $submittedData, $form, $_field_data, $_istance_data);
+      
+      //Newer filter, with an easier name
+      $replace_map = apply_filters('accua_forms_submission', $replace_map, $fid, $submittedData, $form, $_field_data, $_istance_data);
       
       $replace_map['__submitted_html'] = $submitted_html = '<table><tr><td>' . $replace_map['__submitted_html'] . '</td></tr></table>';
       unset($replace_map['__submitted_txt_raw'], $replace_map['__submitted_html_raw'], $replace_map['__submitted_json_raw'], $replace_map['__autoreply_email_raw']);
@@ -2490,7 +2921,7 @@ function accua_forms_shortcode_handler($atts, $content = '', $code = '') {
   
   $out = '';
   
-  if (AccuaForm::getSumbittedID() == $fid) {
+  if (AccuaForm::getSubmittedID() == $fid) {
     /* return "<pre>Form submitted.\n\nData: " . print_r(AccuaForm::getSubmittedData(), true) . '</pre>'; */
     $messages = AccuaForm::getSubmittedMessages();
     if ($messages) {
@@ -2505,6 +2936,11 @@ function accua_forms_shortcode_handler($atts, $content = '', $code = '') {
   }
   
   return $out . $form->render(true);
+}
+
+function accua_forms_include($fid, $atts=array(), $content = '', $code = '') {
+  $atts['fid'] = $fid;
+  echo accua_forms_shortcode_handler($atts, $content, $code);
 }
 
 function accua_forms_submissions_list_page_head(){
@@ -2941,7 +3377,7 @@ function &accua_get_pages($args = '') {
   if ( !empty($number) )
     $query .= ' LIMIT ' . $offset . ',' . $number;
 
-  echo "<!-- accua_forms_query:\n$query\n-->";
+  //echo "<!-- accua_forms_query:\n$query\n-->";
 
   $pages = $wpdb->get_results($query);
 

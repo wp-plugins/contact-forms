@@ -16,7 +16,7 @@ div.pfbc-error {
 }
 
 /* standard */
-.accua-form-view-standard { width: 100%; }
+/*.accua-form-view-standard { width: 100%; }*/
 .accua-form-view-standard .pfbc-element { margin-bottom: .6em }
 .accua-form-view-standard .pfbc-label { margin-bottom: .2em; }
 .accua-form-view-standard .pfbc-label label { display: block; width: 100%;}
@@ -25,7 +25,7 @@ div.pfbc-error {
 .accua-form-view-standard .pfbc-buttons { text-align: right; }
 
 /* sidebyside  */
-.accua-form-view-sidebyside { width: 100%; }
+/*.accua-form-view-sidebyside { width: 100%; }*/
 .accua-form-view-sidebyside .pfbc-element { margin-bottom: 0.6em; }
 .accua-form-view-sidebyside .pfbc-elementbottom { clear: both; }
 .accua-form-view-sidebyside .pfbc-label { margin-bottom: .2em; float: left; width:25%;}

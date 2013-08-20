@@ -3,11 +3,11 @@ input[type="text"].accua_form_value, textarea.accua_form_value {
   margin-right: 5%;
 }
 
-#accua-forms-edit-form-page .sidebar-name-arrow {
+#accua_forms_edit_page .sidebar-name-arrow {
   display: none !important;
 }
 
-#accua-forms-edit-form-page #widgets-left .widget-holder, #accua-forms-edit-form-page #widgets-right .widgets-sortables {
+#accua_forms_edit_page #widgets-left .widget-holder, #accua_forms_edit_page #widgets-right .widgets-sortables {
   overflow-y: scroll !important;
   overflow-x: hidden !important;
   height: 400px;
@@ -88,15 +88,16 @@ input[type="text"].accua_form_value, textarea.accua_form_value {
 }
 
 #accua_form_use_ajax, #accua_form_layout {
-    float: left;
+    clear: both;
     line-height: 25px;
 }
 
 #accua_form_layout {
-  margin-right:50px;
+  margin-right: 50px;
+  margin-bottom: 9px;
 }
 
-#accua-forms-edit-form-page #accua_tabs {
+#accua_forms_edit_page #accua_tabs {
   position: relative;
 }
 
@@ -112,17 +113,17 @@ input[type="text"].accua_form_value, textarea.accua_form_value {
     width: 400px;
 }
 
-#accua-forms-edit-form-page #accua_form_save_settings {
+#accua_forms_edit_page #accua_form_save_settings {
   float: left;
   margin-right: 6px;
 }
 
-#accua-forms-edit-form-page form#delete_form {
+#accua_forms_edit_page form#delete_form {
     float: right;
     margin-left: 6px;
 }
 
-#accua-forms-edit-form-page form#delete_form input {
+#accua_forms_edit_page form#delete_form input {
     background: none;
     border: none;
     color: red;
@@ -130,66 +131,87 @@ input[type="text"].accua_form_value, textarea.accua_form_value {
     cursor:pointer;
 }
 
-#accua-forms-edit-form-page form#delete_form input:hover {
+#accua_forms_edit_page form#delete_form input:hover {
   background:red;
   color:#fff;
 }
 
-#accua_tab_messages .defalut_content_message {
+#accua_tab_messages .defalut_content_message,
+#accua_tab_preview .defalut_content_message {
   background: #fff;
   border: 1px solid #ddd;
   margin-top: 10px;
   padding: 20px;
 }
 
-#accua_tab_messages .defalut_message {
+#accua_tab_messages .defalut_message,
+#accua_tab_preview .defalut_message {
   padding-top:20px;
 }
 
-#accua_tab_messages #dashboard_right_now a.insert-media {
+#accua_tab_messages #dashboard_right_now a.insert-media,
+#accua_tab_preview #dashboard_right_now a.insert-media {
     float: none;
     top: 0;
 }
 
-#accua_tab_messages .wp-editor-wrap {
+#accua_tab_messages .wp-editor-wrap,
+#accua_tab_preview  .wp-editor-wrap {
     margin-top: 10px;
 }
 
-#accua_tab_messages .label_input {
+#accua_tab_messages .label_input,
+#accua_tab_preview .label_input {
     display: block;
     line-height: 27px;
     margin-bottom: 9px;
     width: 100%;
+    float: left;
 }
 
-#accua_tab_messages .label_input label {
+#accua_tab_messages .label_input label,
+#accua_tab_preview .label_input label {
     float: left;
     margin-right: 10px;
-    width: 38px;
+    width: 20%;
 }
 
-#accua_tab_messages .label_input input.accua_form_value[type="text"] {
+#accua_tab_messages .label_input input.accua_form_value[type="text"],
+#accua_tab_preview .label_input input.accua_form_value[type="text"] {
     float: left;
     width: 45%;
 }
 
-#accua_tab_messages input.accua_form_check_override[type="checkbox"] {
+#accua_tab_messages input.accua_form_check_override[type="checkbox"],
+#accua_tab_preview input.accua_form_check_override[type="checkbox"] {
     margin-right: 5px;
 }
 
-#accua_tab_messages input[value="1"][type="radio"], #accua_tab_messages input[value="-1"][type="radio"]  {
+#accua_tab_messages input[value="1"][type="radio"], #accua_tab_messages input[value="-1"][type="radio"] {
     margin-left: 20px;
 }
 
-#accua_tab_messages .accua_form_value[disabled] {
+#accua_tab_messages .accua_form_value[disabled],
+#accua_tab_preview .accua_form_value[disabled] {
     color: #BBBBBB;
 }
 
-#accua_tab_messages .default_value {
+#accua_tab_messages .default_value,
+#accua_tab_preview .default_value {
     border: 1px solid #ddd;
     color: #999;
     float: left;
     line-height: 22px;
+    min-height: 21px;
+    margin: 1px 5% 1px 0;
+    padding-left: 1%;
+    padding-right: 1%;
+    width: 43%;
+}
+
+#accua_tab_preview .wp-picker-container {
+    border: 1px solid trasparent;
+    float: left;
     margin: 1px 5% 1px 0;
     padding-left: 1%;
     padding-right: 1%;
@@ -227,14 +249,18 @@ input[type="text"].accua_form_value, textarea.accua_form_value {
   padding: 0;
 }
 
-#accua-forms-edit-form-page .#dialog_token {
+#accua_forms_edit_page .#dialog_token {
    padding: 0 20px 20px;
 }
 
-#accua-forms-edit-form-page .defalut_content_message {
+#accua_forms_edit_page .defalut_content_message {
  white-space: pre-wrap;       /* css-3 */
  white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
  white-space: -pre-wrap;      /* Opera 4-6 */
  white-space: -o-pre-wrap;    /* Opera 7 */
  word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+
+.accua_forms_admin_page textarea {
+  resize: vertical;
 }
