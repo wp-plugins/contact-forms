@@ -73,16 +73,17 @@ For more info, check out the following articles:
 == Changelog ==
 
 = 1.1 =
-* Interface to set basic form style (borders, colors, padding)
-* Fixed captcha check
-* Submission graph by form
+* Added interface to set basic form styles (borders, colors, padding)
+* Fixed captcha validation
+* Added submission graph by form
 * Screenshots removed from the package
-* Other minor fix
+* Other minor fixes
 
 
 == Frequently Asked Questions ==
 
-You'll find the [FAQ on www.cimatti.it](http://www.cimatti.it/wordpress/contact-forms/faq/).
+You'll find the [FAQ on our website](http://www.cimatti.it/wordpress/contact-forms/faq/).
+
 
 == Screenshots ==
 
