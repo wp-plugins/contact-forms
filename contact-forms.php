@@ -2,7 +2,7 @@
 /*
 Plugin Name: WordPress Contact Forms by Cimatti
 Description: Quickly create and publish forms in your WordPress powered website.
-Version: 1.1
+Version: 1.2
 Plugin URI: http://www.cimatti.it/wordpress/contact-forms/
 Author: Cimatti Consulting
 Author URI: http://www.cimatti.it
@@ -53,11 +53,11 @@ function accua_dashboard_page()
 { 
   global $wpdb;
   $num_posts = $wpdb->get_results("SELECT count(DISTINCT afs_post_id ) as num_row
-		FROM {$wpdb->prefix}accua_forms_submissions WHERE afs_post_id <> 0", ARRAY_A);
+		FROM {$wpdb->prefix}accua_forms_submissions WHERE afs_post_id <> 0 AND afs_status >= 0", ARRAY_A);
   $num_forms = $wpdb->get_results("SELECT count(DISTINCT afs_form_id ) as num_row
-		FROM {$wpdb->prefix}accua_forms_submissions", ARRAY_A);
+		FROM {$wpdb->prefix}accua_forms_submissions WHERE afs_status >= 0", ARRAY_A);
   $num_submissions = $wpdb->get_results("SELECT count(*) as num_row
-    FROM {$wpdb->prefix}accua_forms_submissions", ARRAY_A);
+    FROM {$wpdb->prefix}accua_forms_submissions WHERE afs_status >= 0", ARRAY_A);
   
   //seleziono i campi email
   $email_fields = array();
@@ -70,7 +70,8 @@ function accua_dashboard_page()
   $num_emails = $wpdb->get_results("SELECT COUNT(DISTINCT (`afsv_value`)) as num_row
     FROM {$wpdb->prefix}accua_forms_submissions, {$wpdb->prefix}accua_forms_submissions_values
     WHERE `afs_id` = `afsv_sub_id`
-    AND afsv_field_id IN ({$email_fields_string})", ARRAY_A);
+    AND afsv_field_id IN ({$email_fields_string})
+    AND afs_status >= 0", ARRAY_A);
   
   
   $forms_data = get_option('accua_forms_saved_forms', array());
@@ -89,10 +90,11 @@ function accua_dashboard_page()
   
   //costruisco il grafico
   
-  $query_grafico = $wpdb->get_results("SELECT YEAR( afs_submitted ) AS `year` , MONTH( afs_submitted ) AS `month` , COUNT( * ) AS `submissions` , COUNT( DISTINCT (`afsv_value`)) AS `unique_submissions`
-  FROM `{$wpdb->prefix}accua_forms_submissions` , `{$wpdb->prefix}accua_forms_submissions_values`
-  WHERE `afs_id` = `afsv_sub_id`
-  AND afsv_field_id IN ({$email_fields_string})
+  $query_grafico = $wpdb->get_results("SELECT YEAR( afs_submitted ) AS `year` , MONTH( afs_submitted ) AS `month` , COUNT( DISTINCT (`afs_id`) ) AS `submissions` , COUNT( DISTINCT (`afsv_value`)) AS `unique_submissions`
+  FROM `{$wpdb->prefix}accua_forms_submissions`
+    LEFT JOIN `{$wpdb->prefix}accua_forms_submissions_values` ON `afs_id` = `afsv_sub_id`
+  WHERE afsv_field_id IN ({$email_fields_string})
+  AND afs_status >= 0
   $fid_param
   GROUP BY `year` , `month`
   ORDER BY `year` DESC , `month` DESC");
@@ -247,10 +249,11 @@ function accua_forms_install(){
   afs_status TINYINT(1) NOT NULL DEFAULT 0,
   afs_stats TEXT NOT NULL DEFAULT '',
   PRIMARY KEY  (afs_id),
-  KEY form (afs_form_id),
+  KEY form (afs_form_id, afs_status),
   KEY uri (afs_uri),
   KEY pid (afs_post_id),
-  KEY referrer (afs_referrer)
+  KEY referrer (afs_referrer),
+  KEY status (afs_status, afs_id),
   ) $charset_collate;";
   dbDelta($sql);
 

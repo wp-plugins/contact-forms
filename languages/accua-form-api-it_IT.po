@@ -916,8 +916,17 @@ msgstr "Attenzione: le password sono campi obbligatori."
 #~ msgid "Delete"
 #~ msgstr "Cancella"
 
-#~ msgid "Error moving submissions to trash.<br />"
-#~ msgstr "Errore durante lo spostamento nel cestino.<br />"
+msgid "Error moving submissions to trash."
+msgstr "Errore durante lo spostamento nel cestino."
+
+msgid "Moved 1 submission to trash."
+msgstr "1 invio spostato nel cestino."
+
+msgid "Moved %res submissions to trash."
+msgstr "%res invii spostati nel cestino."
+
+msgid "No submission selected."
+msgstr "Nessun invio selezionato."
 
 #~ msgid "Bulk Actions"
 #~ msgstr "Modifica di massa"
@@ -1051,3 +1060,36 @@ msgstr "La risposta reCATPCHA non era corretta, Riprova."
 
 msgid "Submit"
 msgstr "Invia"
+
+msgid "Color picker"
+msgstr "Selettore colore"
+
+msgid "Date picker"
+msgstr "Selettore data"
+
+msgid "Date"
+msgstr "Data"
+
+msgid "Fieldset begin"
+msgstr "Inizio raggruppamento campi"
+
+msgid "You can use this multiple times."
+msgstr "Puoi usare questo campo più volte."
+
+msgid "Fieldset end"
+msgstr "Fine raggruppamento campi"
+
+msgid "Move to trash"
+msgstr "Sposta nel cestino"
+
+msgid "Forms deleted"
+msgstr "Form cancellati"
+
+msgid "Error restoring submissions."
+msgstr "Errore durante il ripristino degli invii."
+
+msgid "Restored 1 submission."
+msgstr "Ripristinato 1 invio."
+
+msgid "Restored %res submissions."
+msgstr "Ripristinati %res invii."

@@ -10,7 +10,7 @@ class AccuaForm_View_Standard extends View {
 		for($e = 0; $e < $elementSize; ++$e) {
 			$element = $elements[$e];
 
-			if($element instanceof Element_Hidden || $element instanceof Element_HTMLExternal) {
+			if($element instanceof Element_Hidden || $element instanceof Element_HTMLExternal || $element instanceof AccuaForm_Element_FieldsetBegin || $element instanceof AccuaForm_Element_FieldsetEnd) {
         $element->render();
 		  } elseif($element instanceof Element_Button) {
         if($e == 0 || !$elements[($e - 1)] instanceof Element_Button)

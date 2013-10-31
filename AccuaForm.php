@@ -851,7 +851,9 @@ JS;
   if (ajax_enabled) {
     thisform.attr("action", {$ajax_url} );
     thisform.attr("target","submit_target_{$js_buildid}");
-    window.addEventListener('message', _handle_ajax_submit_message_{$js_buildid}, false);
+    try {
+      window.addEventListener('message', _handle_ajax_submit_message_{$js_buildid}, false);
+    } catch (e) { }
     $('input[name="_AccuaForm_submit_method"]', thisform).val('iframe');
   } else {
     thisform.attr("action", {$post_url} );

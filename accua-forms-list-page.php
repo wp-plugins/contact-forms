@@ -107,9 +107,13 @@ class Accua_Forms_List_Table extends WP_List_Table {
     }
     
     function get_bulk_actions() {
-      $actions = array(
-          'delete' => 'Delete'
-      );
+      if(isset($_GET['del']) && $_GET['del']==1) {
+        $actions = array();
+      } else {
+        $actions = array(
+            'delete' => __('Move to trash', 'accua-form-api')
+        );
+      }
       return $actions;
     }
     
@@ -165,7 +169,7 @@ class Accua_Forms_List_Table extends WP_List_Table {
         if ($forms_deleted) {
           update_option('accua_forms_trash_forms', $trash_data);
           update_option('accua_forms_saved_forms', $forms_data);
-          $this->set_message("Form cancellati");
+          $this->set_message(__("Forms deleted", 'accua-form-api'));
         }
        
       }
@@ -175,9 +179,7 @@ class Accua_Forms_List_Table extends WP_List_Table {
     function prepare_items() {
         global $wpdb, $hook_suffix;
         $per_page = 50;
-        $del = false;
-        if(isset($_GET['del']) && $_GET['del']==1)
-            $del = true;
+        $del = isset($_GET['del']) && $_GET['del']==1;
 
         $columns = $this->get_columns();
         $hidden = get_hidden_columns($hook_suffix);
@@ -194,7 +196,7 @@ class Accua_Forms_List_Table extends WP_List_Table {
         $forms_trash = get_option('accua_forms_trash_forms', array());
         
         $this->active_items = count($forms_data);
-        $this->del_items = count($forms_data);
+        $this->del_items = count($forms_trash);
         
         $data = array();
         
@@ -215,15 +217,15 @@ class Accua_Forms_List_Table extends WP_List_Table {
             'ID' => $id,
             'title' => $title,
             'submissions' => 0,
-            'shortcode'=> '[accua-form fid="'.$id.'"]',
-            'phpcode'=>"<?php accua_forms_include('$id'); ?>",
+            'shortcode'=> $del?'':'[accua-form fid="'.$id.'"]',
+            'phpcode'=> $del?'':"<?php accua_forms_include('$id'); ?>",
             'deleted' => $del,
           );
         }
 
         $query = "SELECT afs_form_id AS fid, count(*) AS submissions
               FROM `{$wpdb->prefix}accua_forms_submissions`
-              WHERE afs_status <> -1
+              WHERE afs_status >= 0
               GROUP BY afs_form_id";
         
         $submissions = $wpdb->get_results($query, OBJECT);
@@ -231,15 +233,17 @@ class Accua_Forms_List_Table extends WP_List_Table {
           if (isset($data[$fsub->fid])) {
             $data[$fsub->fid]['submissions'] = $fsub->submissions;
           } else if ($del){
-            $data[$fsub->fid] = array(
-              'ID' => $fsub->fid,
-              'submissions' => $fsub->submissions,
-              'deleted' => true,
-              'shortcode' => '',
-              'phpcode' => '',
-            );
-            $this->del_items++;
-          } else if (!isset($forms_data[$fsub->fid])) {
+            if (!isset($forms_data[$fsub->fid])) {
+              $data[$fsub->fid] = array(
+                'ID' => $fsub->fid,
+                'submissions' => $fsub->submissions,
+                'deleted' => true,
+                'shortcode' => '',
+                'phpcode' => '',
+              );
+              $this->del_items++;
+            }
+          } else if (!isset($forms_trash[$fsub->fid])) {
             $this->del_items++;
           }
         }

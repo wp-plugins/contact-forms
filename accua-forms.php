@@ -150,7 +150,7 @@ jQuery(function($){
 }
 
 function accua_forms_edit_page_head_styles() {
-  wp_admin_css( 'widgets' );
+  //wp_admin_css( 'widgets' );
   wp_enqueue_style( 'accua-forms-admin', plugins_url('accua-forms-admin.css', __FILE__), array('wp-color-picker'), '1');
 }
 
@@ -420,7 +420,8 @@ function accua_forms_field_text_settings_form($fid, $field_data=array(), $istanc
   
   $multi_number = '';
   
-  if ($istance_data['ref'] == '__html') {
+  if (in_array($istance_data['ref'], array('__html','__fieldset-begin','__fieldset-end'))) {
+    $forceoverride_field = true;
     if ($empty_istance) {
       $add_new = 'multi';
       $istance_data['istance_id'] .= '-__i__';
@@ -432,6 +433,7 @@ function accua_forms_field_text_settings_form($fid, $field_data=array(), $istanc
       }
     }
   } else {
+    $forceoverride_field = false;
     $add_new = $empty_istance ? 'single' : '';
   } 
   
@@ -453,38 +455,45 @@ function accua_forms_field_text_settings_form($fid, $field_data=array(), $istanc
     'save' => __( 'Save', 'accua-form-api')
   );
             
-
-  
+  if ($forceoverride_field) {
+    $override_begin = '';
+    $override_type = 'hidden';
+    $override_end = '';
+  } else {
+    $override_begin = "({$testi_eot['override']}: ";
+    $override_type = 'checkbox';
+    $override_end = ')';
+  }
   
   $content = <<<EOT
     <p><label for="widget-{$istance_data['istance_id']}-label">{$testi_eot['label']}:</label> 
-    ({$testi_eot['override']}: <input type="checkbox" name="form-field-{$istance_data['istance_id']}-override-label" value="1" {$override_label} />)<br>
+    {$override_begin}<input type="{$override_type}" name="form-field-{$istance_data['istance_id']}-override-label" value="1" {$override_label} />{$override_end}<br>
     <input type="text" value="{$istance_data['label']}" name="form-field-{$istance_data['istance_id']}-label" id="widget-{$istance_data['istance_id']}-label" class="widefat"></p>
 EOT;
   
   $default_value = <<<EOT
     <p><label for="widget-{$istance_data['istance_id']}-default-value">{$testi_eot['default_value']}:</label> 
-    ({$testi_eot['override']}: <input type="checkbox" name="form-field-{$istance_data['istance_id']}-override-default-value" value="1" {$override_default_value} />)<br>
+    {$override_begin}<input type="{$override_type}" name="form-field-{$istance_data['istance_id']}-override-default-value" value="1" {$override_default_value} />{$override_end}<br>
     <input type="text" value="{$istance_data['default_value']}" name="form-field-{$istance_data['istance_id']}-default-value" id="widget-{$istance_data['istance_id']}-default-value" class="widefat"></p>
 EOT;
 
   $default_values = <<<EOT
     <p><label for="widget-{$istance_data['istance_id']}-default-value">{$testi_eot['default_value']}:</label> 
-    ({$testi_eot['override']}: <input type="checkbox" name="form-field-{$istance_data['istance_id']}-override-default-value" value="1" {$override_default_value} />)<br>
+    {$override_begin}<input type="{$override_type}" name="form-field-{$istance_data['istance_id']}-override-default-value" value="1" {$override_default_value} />{$override_end}<br>
     <input type="text" value="{$istance_data['default_value']}" name="form-field-{$istance_data['istance_id']}-default-value" id="widget-{$istance_data['istance_id']}-default-value" class="widefat"><br />
     </p>
 EOT;
 
   $allowed_values = <<<EOT
     <p><label for="widget-{$istance_data['istance_id']}-allowed-values">{$testi_eot['allowed_values']}:</label> 
-    ({$testi_eot['override']}: <input type="checkbox" name="form-field-{$istance_data['istance_id']}-override-allowed-values" value="1" {$override_allowed_values} />)<br>
+    {$override_begin}<input type="{$override_type}" name="form-field-{$istance_data['istance_id']}-override-allowed-values" value="1" {$override_allowed_values} />{$override_end}<br>
     <textarea rows="6" cols="50" name="form-field-{$istance_data['istance_id']}-allowed-values" id="widget-{$istance_data['istance_id']}-allowed-values" class="widefat">{$istance_data['allowed_values']}</textarea><br />
     {$testi_eot['desc_all']}</p>
 EOT;
   
   $allowed_ext = <<<EOT
     <p><label for="widget-{$istance_data['istance_id']}-allowed-values">{$testi_eot['allowed_extensions']}:</label> 
-    ({$testi_eot['override']}: <input type="checkbox" name="form-field-{$istance_data['istance_id']}-override-allowed-values" value="1" {$override_allowed_values} />)<br>
+    {$override_begin}<input type="{$override_type}" name="form-field-{$istance_data['istance_id']}-override-allowed-values" value="1" {$override_allowed_values} />{$override_end}<br>
     <textarea rows="6" cols="50" name="form-field-{$istance_data['istance_id']}-allowed-values" id="widget-{$istance_data['istance_id']}-allowed-values" class="widefat">{$istance_data['allowed_values']}</textarea><br />
     {$testi_eot['desc_all_ext']}</p>
 EOT;
@@ -498,7 +507,7 @@ EOT;
     case 'textarea':
       $content .= <<<EOT
     <p><label for="widget-{$istance_data['istance_id']}-default-value">{$testi_eot['default_value']}:</label> 
-      ({$testi_eot['override']}: <input type="checkbox" name="form-field-{$istance_data['istance_id']}-override-default-value" value="1" {$override_default_value} />)<br>
+      {$override_begin}<input type="{$override_type}" name="form-field-{$istance_data['istance_id']}-override-default-value" value="1" {$override_default_value} />{$override_end}<br>
       <textarea rows="6" cols="50" name="form-field-{$istance_data['istance_id']}-default-value" id="widget-{$istance_data['istance_id']}-default-value" class="widefat">{$istance_data['default_value']}</textarea></p>
     $required
 EOT;
@@ -521,18 +530,26 @@ EOT;
     case 'file':
       $content .= $allowed_ext . $required;
     case 'submit':
+    case 'fieldset-begin':
       //just the label
+    break;
+    case 'fieldset-end':
+      //Nothing!
+      $content = '';
     break;
     case 'html':
       $content = <<<EOT
     <p><label for="widget-{$istance_data['istance_id']}-default-value">{$testi_eot['custom_HTML_content']}</label> 
-      ({$testi_eot['override']}: <input type="checkbox" name="form-field-{$istance_data['istance_id']}-override-default-value" value="1" {$override_default_value} />)<br>
+      {$override_begin}<input type="{$override_type}" name="form-field-{$istance_data['istance_id']}-override-default-value" value="1" {$override_default_value} />{$override_end}<br>
       <textarea rows="6" cols="50" name="form-field-{$istance_data['istance_id']}-default-value" id="widget-{$istance_data['istance_id']}-default-value" class="widefat">{$istance_data['default_value']}</textarea></p>
 EOT;
     break;
     case 'email':
     case 'autoreply_email':
     case 'textfield':
+    case 'colorpicker':
+    case 'datepicker':
+    case 'dateselect':
     default:
       $content .= $default_value . $required;
     break;
@@ -584,12 +601,13 @@ EOT;
 
 function accua_forms_add_page($message='') {
   $forms_data = get_option('accua_forms_saved_forms', array());
+  $trash_data = get_option('accua_forms_trash_forms', array());
   if (!empty($_GET['fid'])) {
     $fid = htmlspecialchars(stripslashes($_GET['fid']), ENT_QUOTES);
   } else {
     if ($message === '') {
       $fid = 1 + ((int) get_option('accua_forms_lastid', 0));
-      while (isset($forms_data[$fid])) {
+      while (isset($forms_data[$fid]) || isset($trash_data[$fid])) {
         $fid++;
       }
       update_option('accua_forms_lastid', $fid);
@@ -822,7 +840,7 @@ function accua_forms_edit_page($fid) {
           <div class="widgets-holder-wrap">
             <div class="sidebar-name">
             <div class="sidebar-name-arrow"><br></div>
-            <h3><?php _e( 'Form fields', 'accua-form-api'); ?> <span><img alt="" title="" class="ajax-feedback" src="<?php echo $adminurl;?>images/wpspin_dark.gif"></span></h3>
+            <h3><?php _e( 'Form fields', 'accua-form-api'); ?> <span><img alt="" title="" class="ajax-feedback" src="<?php echo $adminurl;?>images/wpspin_light.gif"></span></h3>
             </div>
             <div class="widgets-sortables ui-sortable" id="cimatti-accua-fields-form-area-<?php echo $fid_esc ?>">
               <div class="sidebar-description" style="width: 95%">
@@ -832,6 +850,23 @@ function accua_forms_edit_page($fid) {
                 foreach ($form_data['fields'] as $field) {
                   if (empty($avail_fields[$field['ref']])) {
                     $ref = array();
+                    if (!empty($field['ref'])) {
+                      if ($field['ref'] == '__fieldset-begin') {
+                        $ref = array(
+                            'id' => '__fieldset-begin',
+                            'name' => __('Fieldset begin', 'accua-form-api'),
+                            'type' => 'fieldset-begin',
+                            'description' => '',
+                        );
+                      } else if ($field['ref'] == '__fieldset-end') {
+                        $ref = array(
+                            'id' => '__fieldset-end',
+                            'name' => __('Fieldset end', 'accua-form-api'),
+                            'type' => 'fieldset-end',
+                            'description' => '',
+                        );
+                      }
+                    }
                   } else {
                     $ref = $avail_fields[$field['ref']];
                   }
@@ -874,6 +909,24 @@ function accua_forms_edit_page($fid) {
   }
   //Custom HTML field
   echo accua_forms_field_text_settings_form($fid);
+  //Fieldset begin
+  echo accua_forms_field_text_settings_form($fid, array(
+      'id' => '__fieldset-begin',
+      'name' => __( 'Fieldset begin', 'accua-form-api'),
+      'type' => 'fieldset-begin',
+      'description' => __('You can use this field multiple times.', 'accua-form-api'),
+      'default_value' => '',
+      'allowed_values' => '',
+  ));
+  //Fieldset end
+  echo accua_forms_field_text_settings_form($fid, array(
+    'id' => '__fieldset-end',
+    'name' => __( 'Fieldset end', 'accua-form-api'),
+    'type' => 'fieldset-end',
+    'description' => __('You can use this field multiple times.', 'accua-form-api'),
+    'default_value' => '',
+    'allowed_values' => '',
+  ));
 ?>
 
 <!-- end fields list -->
@@ -2290,12 +2343,30 @@ function accua_forms_form_generate($baseid, $form) {
       }
       
       $add_submit = true;
+      $fieldset_open = false;
       $avail_fields = get_option('accua_forms_avail_fields', array());
       
       foreach ($form_data['fields'] as $istance_data) {
         
         if (empty($avail_fields[$istance_data['ref']])) {
           $field_data = array();
+          if (!empty($istance_data['ref'])) {
+            if ($istance_data['ref'] == '__fieldset-begin') {
+              $field_data = array(
+                'id' => '__fieldset-begin',
+                'name' => __('Fieldset begin', 'accua-form-api'),
+                'type' => 'fieldset-begin',
+                'description' => '',
+              );
+            } else if ($istance_data['ref'] == '__fieldset-end') {
+              $field_data = array(
+                'id' => '__fieldset-end',
+                'name' => __('Fieldset end', 'accua-form-api'),
+                'type' => 'fieldset-end',
+                'description' => '',
+              );
+            }
+          }
         } else {
           $field_data = $avail_fields[$istance_data['ref']];
         }
@@ -2422,6 +2493,20 @@ function accua_forms_form_generate($baseid, $form) {
               ));
             //"Errore: '{$istance_data['label']}' deve contenere un indirizzo email valido."
           break;
+          case 'fieldset-begin':
+            if ($fieldset_open) {
+              $form->addElement(new AccuaForm_Element_FieldsetEnd());
+            } else {
+              $fieldset_open = true;
+            }
+            $element = new AccuaForm_Element_FieldsetBegin($istance_data['label']);
+          break;
+          case 'fieldset-end':
+            if ($fieldset_open) {
+              $element = new AccuaForm_Element_FieldsetEnd();
+              $fieldset_open = false;
+            }
+          break;
           case 'submit':
             $add_submit = false;
             $element = new Element_Button($istance_data['label'], 'submit', $submit_properties+array('name' => $istance_data['istance_id'], 'value' => $istance_data['default_value']));
@@ -2471,7 +2556,10 @@ function accua_forms_form_generate($baseid, $form) {
 			    $element_conf=NULL;
 		    }
       }
-      
+      if ($fieldset_open) {
+        $form->addElement(new AccuaForm_Element_FieldsetEnd());
+        $fieldset_open = false;
+      }
       if ($add_submit) {
         $form->addElement(new Element_Button(__('Submit', 'accua-form-api'), 'submit', $submit_properties));
       }
@@ -2599,7 +2687,24 @@ function accua_forms_form_submission_handler($submittedID, $submittedData, $form
         $istance_data = $form_data['fields'][$istance_id];
         
         if (empty($avail_fields[$istance_data['ref']])) {
-          $field_data = array();
+          $fieldset_data = array();
+          if (!empty($istance_data['ref'])) {
+            if ($istance_data['ref'] == '__fieldset-begin') {
+              $field_data = array(
+                'id' => '__fieldset-begin',
+                'name' => __('Fieldset begin', 'accua-form-api'),
+                'type' => 'fieldset-begin',
+                'description' => '',
+              );
+            } else if ($istance_data['ref'] == '__fieldset-end') {
+              $field_data = array(
+                'id' => '__fieldset-end',
+                'name' => __('Fieldset end', 'accua-form-api'),
+                'type' => 'fieldset-end',
+                'description' => '',
+              );
+            }
+          }
         } else {
           $field_data = $avail_fields[$istance_data['ref']];
         }
@@ -2987,7 +3092,7 @@ function accua_forms_download_submitted_file(){
         header("Content-length: ".filesize($filename));
         header("Content-disposition: attachment; filename=\"$file\"");
         readfile($filename);
-        die;
+        die('');
       }
     }
   }
@@ -3017,7 +3122,7 @@ function accua_forms_preview() {
   echo accua_forms_shortcode_handler(array('fid'=>$_REQUEST['fid']));
   wp_print_footer_scripts();
   echo '</body></html>';
-  die;
+  die('');
 }
 
 //salvataggio file excel
@@ -3030,6 +3135,7 @@ function accua_forms_submission_page_save_excel() {
   $listTable->prepare_items(true);
   $show_col = explode( ',', $_GET['accua_show_field']);
   accua_forms_submission_page_save_excel_general($listTable,$show_col,'');
+  die('');
 }
 
 

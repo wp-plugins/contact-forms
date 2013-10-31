@@ -53,5 +53,5 @@ try {
 EOJS;
       
   echo '</body></html>';
-  die ("");
+  die('');
 }

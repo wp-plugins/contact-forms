@@ -4,7 +4,11 @@ if(!class_exists('WP_List_Table')){
 }
 
 class Accua_Forms_Submissions_List_Table extends WP_List_Table {
-    
+
+    var $message = NULL;
+    var $active_items = 0;
+    var $del_items = 0;
+  
     function __construct(){
         global $status, $page;
         $this->message = '';
@@ -13,6 +17,14 @@ class Accua_Forms_Submissions_List_Table extends WP_List_Table {
             'plural'    => 'submissions',
             'ajax'      => false
         ) );
+    }
+    
+    function get_num_of_active_items () {
+      return $this->active_items;
+    }
+    
+    function get_num_of_del_items () {
+      return $this->del_items;
     }
     
     function column_default($item, $column_name){
@@ -46,7 +58,7 @@ class Accua_Forms_Submissions_List_Table extends WP_List_Table {
     function get_columns(){
         global $wpdb;
         $columns = array(
-            // 'cb' => '<input type="checkbox" />', //Render a checkbox instead of text
+            'cb' => '<input type="checkbox" />', //Render a checkbox instead of text
             'ID' => 'ID',
             'form_title' => 'Form',
             'form_id' => __("Form ID", 'accua-form-api'),
@@ -72,18 +84,26 @@ class Accua_Forms_Submissions_List_Table extends WP_List_Table {
         return $columns;
     }
     
-    /*
     function get_bulk_actions() {
-      $actions = array(
-          'delete' => 'Delete'
-      );
+      if(isset($_GET['del']) && $_GET['del']==1) {
+        $actions = array(
+            'restore' => __('Restore', 'accua-form-api')
+        );
+      } else {
+        $actions = array(
+            'delete' => __('Move to trash', 'accua-form-api')
+        );
+      }
       return $actions;
     }
-    */
     
     function prepare_items($all=false) {
         global $wpdb, $hook_suffix;
         $per_page = 20;
+        $del = isset($_GET['del']) && $_GET['del']==1;
+        
+        $this->active_items = $wpdb->get_var("SELECT COUNT(*) FROM `{$wpdb->prefix}accua_forms_submissions` WHERE afs_status >= 0");
+        $this->del_items = $wpdb->get_var("SELECT COUNT(*) FROM `{$wpdb->prefix}accua_forms_submissions` WHERE afs_status < 0");
         
         $filter = $filter_query_custom_field = "";
         $search = NULL;
@@ -108,8 +128,6 @@ class Accua_Forms_Submissions_List_Table extends WP_List_Table {
             $search = $_GET['s'];
         }
         
-        // $this->process_bulk_action();
-        
         $columns = $this->get_columns();
         $hidden = get_hidden_columns($hook_suffix);
         $sortable = array();
@@ -120,6 +138,12 @@ class Accua_Forms_Submissions_List_Table extends WP_List_Table {
         $limit = ($current_page - 1) * $per_page;
         
         $forms_data = get_option('accua_forms_saved_forms', array());
+        
+        if ($del) {
+          $afs_status_cond = 'afs_status < 0';
+        } else {
+          $afs_status_cond = 'afs_status >= 0';
+        }
         
         $searching_data = array();
         if( $search != NULL && $search!= '')
@@ -136,7 +160,7 @@ class Accua_Forms_Submissions_List_Table extends WP_List_Table {
             afs_created AS created,
             afs_submitted AS submitted
             FROM `{$wpdb->prefix}accua_forms_submissions`
-            WHERE afs_status >= 0 ".$filter."
+            WHERE $afs_status_cond ".$filter."
             AND (
             afs_ip LIKE '%%".$search."%%'
             OR afs_uri LIKE '%%".$search."%%'
@@ -151,7 +175,7 @@ class Accua_Forms_Submissions_List_Table extends WP_List_Table {
               FROM `{$wpdb->prefix}accua_forms_submissions_values`
               WHERE afsv_value LIKE '%%".$search."%%')
              )
-            ORDER BY afs_submitted DESC";
+            ORDER BY afs_id DESC";
         }
          else 
         {
@@ -166,8 +190,8 @@ class Accua_Forms_Submissions_List_Table extends WP_List_Table {
           afs_created AS created,
           afs_submitted AS submitted
           FROM `{$wpdb->prefix}accua_forms_submissions`
-          WHERE afs_status >= 0 ".$filter."
-          ORDER BY afs_submitted DESC";
+          WHERE $afs_status_cond ".$filter."
+          ORDER BY afs_id DESC";
         }
 
         $data1 = $wpdb->get_results($query1, ARRAY_A);
@@ -230,30 +254,53 @@ class Accua_Forms_Submissions_List_Table extends WP_List_Table {
         
     }
     
-    /*
     function process_bulk_action() {
-      global $wpdb;
-      if('delete'=== $this->current_action() && !empty($_GET['submission'])) {
-        foreach($_GET['submission'] as $i) {
-              $i = (int) $i;
-              $trashed[$i] = $i;
+      if('delete'=== $this->current_action()) {
+        $trashed = array();
+        if ((!empty($_GET['submission'])) && is_array($_GET['submission'])) {
+          foreach($_GET['submission'] as $i) {
+            $i = (int) $i;
+            $trashed[$i] = $i;
+          }
         }
-        $trashed=implode(',',$trashed);
-        
-        $res = $wpdb->query("UPDATE `{$wpdb->prefix}accua_forms_submissions` SET afs_status = -1 WHERE afs_id in ( $trashed )");
-        if ($res === false) {
-            $this->set_message("Error moving submissions to trash.<br />");
+        if ($trashed) {
+          $trashed = implode(',',$trashed);
+          global $wpdb;
+          $res = $wpdb->query("UPDATE `{$wpdb->prefix}accua_forms_submissions` SET afs_status = -1 WHERE afs_id in ( $trashed )");
+          if ($res === false) {
+            $this->set_message(__("Error moving submissions to trash.", 'accua-form-api').'<br />');
+          } else if ($res == 1) {
+            $this->set_message(__("Moved 1 submission to trash.", 'accua-form-api').'<br />');
+          } else {
+            $this->set_message(strtr(__("Moved %res submissions to trash.", 'accua-form-api'), array('%res' => $res)).'<br />');
+          }
         } else {
-            $this->set_message("Moved $res submissions to trash.<br />");
+          $this->set_message(__("No submission selected.", 'accua-form-api').'<br />');
         }
-            
-        
+      } else if('restore'=== $this->current_action()) {
+        $restored = array();
+        if ((!empty($_GET['submission'])) && is_array($_GET['submission'])) {
+          foreach($_GET['submission'] as $i) {
+            $i = (int) $i;
+            $restored[$i] = $i;
+          }
+        }
+        if ($restored) {
+          $restored = implode(',',$restored);
+          global $wpdb;
+          $res = $wpdb->query("UPDATE `{$wpdb->prefix}accua_forms_submissions` SET afs_status = 0 WHERE afs_id in ( $restored )");
+          if ($res === false) {
+            $this->set_message(__("Error restoring submissions.", 'accua-form-api').'<br />');
+          } else if ($res == 1) {
+            $this->set_message(__("Restored 1 submission.", 'accua-form-api').'<br />');
+          } else {
+            $this->set_message(strtr(__("Restored %res submissions.", 'accua-form-api'), array('%res' => $res)).'<br />');
+          }
+        } else {
+          $this->set_message(__("No submission selected.", 'accua-form-api').'<br />');
+        }
       }
-      
-      
     }
-    */
-    
 }
 
 function accua_forms_submissions_list_page($head = false){
@@ -261,7 +308,7 @@ function accua_forms_submissions_list_page($head = false){
     
     global $wpdb;
     if ($listTable === null) {
-     /* if (isset($_POST['action'])) {
+      if (isset($_POST['action'])) {
         if ($_POST['action'] === 'trash' && !empty($_POST['submission']) && is_array($_POST['submission'])) {
           echo "yes";
           $trashed = array();
@@ -273,12 +320,12 @@ function accua_forms_submissions_list_page($head = false){
          
           $res = $wpdb->query("UPDATE `{$wpdb->prefix}accua_forms_submissions` SET afs_status = -1 WHERE afs_id in ( $trashed )");
           if ($res === false) {
-            $this->set_message(__("Error moving submissions to trash.<br />", 'accua-form-api'));
+            $this->set_message(__("Error moving submissions to trash.", 'accua-form-api').'<br />');
           } else {
-            $this->set_message(__("Moved $res submissions to trash.<br />", 'accua-form-api'));
+            $this->set_message(strtr(__("Moved %res submissions to trash.", 'accua-form-api'), array('%res' => $res)).'<br />');
           }
         }
-      } */
+      }
       
       /*
       wp_enqueue_script('jquery-ui-mouse');
@@ -290,7 +337,7 @@ function accua_forms_submissions_list_page($head = false){
       wp_enqueue_script('jquery-ui-sortable');
       
       $listTable = new Accua_Forms_Submissions_List_Table();
-      
+      $listTable->process_bulk_action();
       $listTable->prepare_items();
     }
     
@@ -360,16 +407,31 @@ function accua_forms_submissions_list_page($head = false){
           $filter_search = $_GET['s'];
           $filter.= "&amp;s=".$filter_search;
         }
+        
+        $del = isset($_GET['del']) && ($_GET['del']==1);
+        
         ?>
         
        <?php if($listTable->get_message()!=NULL) { ?>
           <div class="updated"><p><?php echo $listTable->get_message(); ?></p></div>
-          
        <?php } ?>
-       <p><?php _e("Use the screen options to add or remove columns from the table below. Only the visible columns will be exported.", 'accua-form-api'); ?></p>
+       
+       <ul class="subsubsub">
+          <li>
+            <a <?php if (!$del) { echo " class='current' "; } ?> href="admin.php?page=accua_forms_submissions_list">
+            <?php _e("Active", 'accua-form-api'); ?></a> (<?php echo $listTable->get_num_of_active_items(); ?>) |
+          </li>
+          <li>
+            <a  <?php if ($del) { echo " class='current' "; } ?> href="admin.php?page=accua_forms_submissions_list&del=1">
+            <?php _e("Trash", 'accua-form-api'); ?></a> (<?php echo $listTable->get_num_of_del_items(); ?>)
+          </li>
+       </ul>
+       
+       <p style="clear:both;"><?php _e("Use the screen options to add or remove columns from the table below. Only the visible columns will be exported.", 'accua-form-api'); ?></p>
        <form style="margin-top: 20px;" id="submissions-action" method="get" action="">
             <!-- For plugins, we also need to ensure that the form posts back to our current page -->
               <input type="hidden" name="page" value="<?php echo htmlspecialchars(stripslashes($_REQUEST['page'])); ?>" />
+              <input type="hidden" name="del" value="<?php echo htmlspecialchars(stripslashes($_REQUEST['del'])); ?>" />
                <!-- SEARCH FORM -->
                <?php $listTable->search_box(__("Search", 'accua-form-api'), 'search_id'); ?>
                <!-- FINE SEARCH FORM -->
@@ -386,12 +448,12 @@ function accua_forms_submissions_list_page($head = false){
             $saved_forms_id_string = implode(',',$saved_forms_id);
             
             $id_del_other_forms = $wpdb->get_results("SELECT distinct afs_form_id
-                FROM {$wpdb->prefix}accua_forms_submissions WHERE afs_form_id NOT IN ($saved_forms_id_string)", ARRAY_A);
+                FROM {$wpdb->prefix}accua_forms_submissions WHERE afs_form_id NOT IN ($saved_forms_id_string) AND afs_status >= 0", ARRAY_A);
             
 
             //post submissions
             $id_posts = $wpdb->get_results("SELECT distinct afs_post_id
-			          FROM {$wpdb->prefix}accua_forms_submissions WHERE afs_post_id <> 0", ARRAY_A); 
+			          FROM {$wpdb->prefix}accua_forms_submissions WHERE afs_post_id <> 0 AND afs_status >= 0 ", ARRAY_A); 
             
             
             ?>
@@ -429,7 +491,7 @@ function accua_forms_submissions_list_page($head = false){
                           echo " selected ";
                           $filter.= "&amp;fid=".$filter_form;
                         }
-                        echo $id_del_other_form['afs_form_id']."(del) </option>";
+                        echo $id_del_other_form['afs_form_id']." (del) </option>";
                   	 }
                   	 
                      ?>
@@ -443,7 +505,7 @@ function accua_forms_submissions_list_page($head = false){
           <!--
              function set_parameter(sel_column) {
                var stringa ='';
-               var name_action = ajaxurl + "?action=accua_forms_submission_page_save_excel"; 
+               var name_action = ajaxurl + "?action=accua_forms_submission_page_save_excel<?php if ($del) {echo '&del=1';} ?>"; 
                if(sel_column) { 
                  jQuery('#adv-settings input[type=checkbox]:checked').each(function() {
                    stringa += jQuery(this).attr("id").replace("-hide","")  + "%2C";
@@ -479,6 +541,7 @@ function accua_forms_submissions_list_page($head = false){
        <form style="margin-top: 20px;" id="submissions-action" method="get" action="">
        <!-- Now we can render the completed list table -->
          <input type="hidden" name="page" value="<?php echo htmlspecialchars(stripslashes($_REQUEST['page'])); ?>" />
+         <input type="hidden" name="del" value="<?php echo htmlspecialchars(stripslashes($_REQUEST['del'])); ?>" />
             <?php $listTable->display(); ?>
         </form>
         <?php /* <pre>$listTable = <?php echo htmlspecialchars(print_r($listTable, true)); ?></pre> */ ?>

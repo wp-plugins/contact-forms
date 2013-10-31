@@ -32,5 +32,5 @@ function add_accua_tinymce_plugin($plugin_array) {
 add_action('wp_ajax_accua_shortcode_button_popup', 'accua_shortcode_buttons_popup');
 function accua_shortcode_buttons_popup() {
   require_once('accua-shortcode-button-popup.php');
-  die;
+  die('');
 }
