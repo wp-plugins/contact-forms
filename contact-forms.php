@@ -2,7 +2,7 @@
 /*
 Plugin Name: WordPress Contact Forms by Cimatti
 Description: Quickly create and publish forms in your WordPress powered website.
-Version: 1.2
+Version: 1.2.1
 Plugin URI: http://www.cimatti.it/wordpress/contact-forms/
 Author: Cimatti Consulting
 Author URI: http://www.cimatti.it
@@ -30,6 +30,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 The full copy of the GNU General Public License is available here: http://www.gnu.org/licenses/gpl.txt
 
 */
+
+define('ACCUA_FORMS_DB_VERSION', '1');
 
 require_once('accua-form-api.php');
 require_once('accua-forms.php');
@@ -209,7 +211,6 @@ function accua_dashboard_page()
 
 }
 
-
 register_activation_hook(__FILE__, 'accua_forms_install');
 function accua_forms_install(){
   $modified = false;
@@ -253,7 +254,7 @@ function accua_forms_install(){
   KEY uri (afs_uri),
   KEY pid (afs_post_id),
   KEY referrer (afs_referrer),
-  KEY status (afs_status, afs_id),
+  KEY status (afs_status, afs_id)
   ) $charset_collate;";
   dbDelta($sql);
 
@@ -722,5 +723,13 @@ The Website Team
     'style_submit_font_size' => '',
   );
   update_option('accua_forms_default_form_data', $form_data);
+  update_option('accua_forms_db_version', ACCUA_FORMS_DB_VERSION);
+}
 
+add_action('admin_init', 'accua_forms_check_db_version_and_update');
+function accua_forms_check_db_version_and_update() {
+  $db_version = get_option('accua_forms_db_version', '');
+  if (ACCUA_FORMS_DB_VERSION != $db_version) {
+    accua_forms_install();
+  }
 }
