@@ -14,6 +14,16 @@ input[type="text"].accua_form_value, textarea.accua_form_value {
   min-height: 400px;
 }
 
+#accua_forms_edit_page .widget-liquid-left {
+  width: 100% !important;
+}
+
+#accua_forms_edit_page #widgets-left .widget {
+  width: 98% !important;
+  margin-bottom: 7px !important;
+  float: none !important;
+}
+
 .accua-form-widget-scroll-wrapper {
   width: 100% !important;
 }

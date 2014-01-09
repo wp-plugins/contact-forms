@@ -1093,3 +1093,6 @@ msgstr "Ripristinato 1 invio."
 
 msgid "Restored %res submissions."
 msgstr "Ripristinati %res invii."
+
+msgid "Attention: '%element%' must be a color in hexadecimal format like '#0080FF'."
+msgstr "Attenzione: '%element%' deve essere un colore in formato esadecimale come '#0080FF'."

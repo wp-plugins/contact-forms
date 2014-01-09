@@ -184,6 +184,7 @@ class AccuaForm extends Form {
     }
     $this->attributes = array(
       'class' => $class,
+      'novalidate' => 'novalidate',
     );
     
     parent::__construct($buildid, $width);

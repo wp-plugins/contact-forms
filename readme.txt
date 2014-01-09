@@ -2,8 +2,8 @@
 Contributors: cimatti
 Tags: contact, form, forms, contact form, contact forms, feedback, mail, email, ajax, attachment, curriculum, contact us, custom form, excel, form builder, web form, feedback, form manager, form to email, form to database, landing page, file upload, email form, customer request, spare parts, invitations, event forms, qtranslate, w3 total cache, drag and drop, form framework, form designer, form creator, php form builder
 Requires at least: 3.5
-Tested up to: 3.7.1
-Stable tag: 1.2.1
+Tested up to: 3.8
+Stable tag: 1.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,10 +54,10 @@ WordPress Contact Forms includes API to help developers customize and add their 
 WordPress Contact Forms uses [PHP form builder class](http://code.google.com/p/php-form-builder-class/) to generate the forms.
 
 = Latest changes =
-
+* Spanish translation by Maria Ramos of [WebHostingHub](http://www.webhostinghub.com/)
+* Color picker field
 * Fieldsets
 * Submissions trash and restore
-* Upgrade to 1.2.1 if you have submissions saving issues
 
 [Read the full changelog](http://wordpress.org/plugins/contact-forms/changelog/)
 
@@ -79,6 +79,12 @@ For more info, check out the following articles:
 
 
 == Changelog ==
+
+= 1.3 =
+* Spanish translation by Maria Ramos of [WebHostingHub](http://www.webhostinghub.com/)
+* Color picker field
+* Possibility to insert raw tokens in html messages
+* Disabled HTML5 validation of email fields, using JavaScript validation
 
 = 1.2.1 =
 * Fixed installation and upgrade process issues introduced in 1.2

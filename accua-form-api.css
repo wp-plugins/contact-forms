@@ -42,3 +42,15 @@ div.pfbc-error {
 .pfbc-invalid {
   background-color: #fcc; 
 }
+
+.accua-form input.wp-color-picker {
+  margin-bottom: 0 !important;
+  border-color: #ccc !important;
+  border-width: 2px !important;
+  border-style: solid !important;
+  border-radius: 4px !important;
+  background-color: transparent !important;
+  padding: 1px 0 !important;
+  color: inherit !important;
+  font-size: inherit !important;
+}

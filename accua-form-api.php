@@ -18,7 +18,9 @@ add_action('plugins_loaded', 'accua_form_init');
 define('ACCUA_FORM_API_PLUGIN_TEXTDOMAIN_PATH', dirname( plugin_basename( __FILE__ ) ) . '/languages/');
 function accua_form_init(){
   wp_enqueue_script('jquery');
+  wp_enqueue_script('wp-color-picker');
   
+  wp_enqueue_style( 'wp-color-picker' );
   wp_enqueue_style( 'accua-forms-api-base', plugins_url('accua-form-api.css', __FILE__), array(), '2');
   
   load_plugin_textdomain( 'accua-form-api', false, ACCUA_FORM_API_PLUGIN_TEXTDOMAIN_PATH);

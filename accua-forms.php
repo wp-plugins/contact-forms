@@ -1709,6 +1709,7 @@ $types = array(
   'multiselect' => __( 'Multiple selections area', 'accua-form-api'), 
   'multicheckbox' => __( 'Multiple checkboxes', 'accua-form-api'),
   'post-multicheckbox' => __( 'Multiple post checkboxes', 'accua-form-api'),
+  'colorpicker' => __( 'Color picker', 'accua-form-api'),
   'hidden' => __('Hidden value',  'accua-form-api'), 
   'file' => __('File upload',  'accua-form-api'), 
   'submit' => __( 'Submit button', 'accua-form-api'), 
@@ -1740,7 +1741,7 @@ $types = array(
 <div class="form-field">
   <label for="tag-slug"><?php _e( 'Field slug (identificative)', 'accua-form-api'); ?></label>
   <input name="form-field-id" id="tag-slug" type="text" value="<?php echo htmlspecialchars($default_form_values['id'], ENT_QUOTES) ?>" <?php if (!$adding) { echo 'disabled="disabled"'; } ?> size="40" />
-  <?php if (!$adding) { echo '<input type="hiden" name="form-field-id" value="'.htmlspecialchars($default_form_values['id'], ENT_QUOTES).'" />'; } ?>
+  <?php if (!$adding) { echo '<input type="hidden" name="form-field-id" value="'.htmlspecialchars($default_form_values['id'], ENT_QUOTES).'" />'; } ?>
   <p><?php _e('The &#8220;slug&#8221; is the URL-friendly version of the name. It is used as an identificator, and is unchangeable. It is usually all lowercase and it must contains only letters, numbers, and underscores.', 'accua-form-api'); ?></p>
 </div>
 <div class="form-field">
@@ -2493,6 +2494,9 @@ function accua_forms_form_generate($baseid, $form) {
               ));
             //"Errore: '{$istance_data['label']}' deve contenere un indirizzo email valido."
           break;
+          case 'colorpicker':
+            $element = new AccuaForm_Element_ColorPicker($istance_data['label'], $istance_data['istance_id'], $field_properties);
+          break;
           case 'fieldset-begin':
             if ($fieldset_open) {
               $form->addElement(new AccuaForm_Element_FieldsetEnd());
@@ -2811,7 +2815,18 @@ function accua_forms_form_submission_handler($submittedID, $submittedData, $form
             $replace_map['__submitted_html_raw'][$istance_data['istance_id']] = "<strong>{$istance_data['istance_id']}</strong></td><td class='valori_submitted'><a href='mailto:".htmlspecialchars($value,ENT_QUOTES)."'>".htmlspecialchars($value)."</a>";
             break;
           case 'submit':
-            break;
+          break;
+          case 'colorpicker':
+            $replace_map['__submitted_txt_raw'][$istance_data['istance_id']] = "{$istance_data['istance_id']}\t$value";
+            $replace_map['__submitted_json_raw'][$istance_data['istance_id']] = $value;
+            if ($value === '') {
+              $value_html = '';
+            } else {
+              $value_esc = htmlspecialchars($value, ENT_QUOTES);
+              $value_html = "<span style='color: $value_esc'><font color='$value_esc'>&#9608;</font></span> $value_esc";
+            }
+            $replace_map['__submitted_html_raw'][$istance_data['istance_id']] = "<strong>{$istance_data['istance_id']}</strong></td><td class='valori_submitted'>$value_html";
+          break;
           default:
             $replace_map['__submitted_txt_raw'][$istance_data['istance_id']] = "{$istance_data['istance_id']}\t$value";
             $replace_map['__submitted_json_raw'][$istance_data['istance_id']] = $value;
@@ -2846,23 +2861,22 @@ function accua_forms_form_submission_handler($submittedID, $submittedData, $form
       //Newer filter, with an easier name
       $replace_map = apply_filters('accua_forms_submission', $replace_map, $fid, $submittedData, $form, $_field_data, $_istance_data);
       
-      $replace_map['__submitted_html'] = $submitted_html = '<table><tr><td>' . $replace_map['__submitted_html'] . '</td></tr></table>';
-      unset($replace_map['__submitted_txt_raw'], $replace_map['__submitted_html_raw'], $replace_map['__submitted_json_raw'], $replace_map['__autoreply_email_raw']);
-      
-      $replacer = new AccuaConditionalReplacer($replace_map);
-      
+      $submitted_html = '<table><tr><td>' . $replace_map['__submitted_html'] . '</td></tr></table>';
       $confirmation_emails_message = $replace_map['__confirmation_emails_message'];
+      unset($replace_map['__submitted_html'], $replace_map['__confirmation_emails_message'], $replace_map['__submitted_txt_raw'], $replace_map['__submitted_html_raw'], $replace_map['__submitted_json_raw'], $replace_map['__autoreply_email_raw']);
       
-      unset($replace_map['__submitted_html'], $replace_map['__confirmation_emails_message']);
+      $replace_map_html = array();
       foreach($replace_map as $key => $value) {
-        $replace_map[$key] = htmlspecialchars($value, ENT_QUOTES);
+        $replace_map_html["!$key"] = $value;
+        $replace_map_html[$key] = htmlspecialchars($value, ENT_QUOTES);
       }
-      $replace_map['__submitted_html'] = $submitted_html;
       
-      $replacer_html = new AccuaConditionalReplacer($replace_map);
-      
-      $confirmation_emails_message = $replacer_html->doReplace($confirmation_emails_message);
-      $replacer_html->appendPattern(array('__confirmation_emails_message' => $confirmation_emails_message));
+      $replace_map['__submitted_html'] = $replace_map_html['__submitted_html'] = $replace_map_html['!__submitted_html'] = $submitted_html;
+      $replacer_html = new AccuaConditionalReplacer($replace_map_html);
+
+      $confirmation_emails_message = $replace_map['__confirmation_emails_message'] = $replacer_html->doReplace($confirmation_emails_message);
+      $replacer_html->appendPattern(array('__confirmation_emails_message' => $confirmation_emails_message, '!__confirmation_emails_message' => $confirmation_emails_message));
+      $replacer = new AccuaConditionalReplacer($replace_map);
       
       $form_data_replaced = array();
       
@@ -3114,7 +3128,7 @@ function accua_forms_preview() {
   if (!current_user_can(10)){
     die ('');
   }
-  wp_enqueue_script('jquery');
+  
   echo '<html><head>';
   wp_print_styles();
   wp_print_head_scripts();
@@ -3257,6 +3271,7 @@ function accua_forms_print_tokens() {
   echo <<<EOT
 <div class="accua_forms_token_list">
 <h2>Tokens</h2>
+<em>In HTML text, use {!token_name} to insert unfiltered token value</em>
 <h3>Fields</h3>
 <em>These tokens are available only if the field is added to the form</em>
 <pre>$tokens</pre>

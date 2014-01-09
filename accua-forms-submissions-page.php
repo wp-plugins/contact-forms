@@ -231,8 +231,16 @@ class Accua_Forms_Submissions_List_Table extends WP_List_Table {
               $filename = htmlspecialchars($row->afsv_value,ENT_QUOTES);
               $fielddata = "<a href='{$url}' target='_blank'>{$filename}</a>";
             break;
+            case 'colorpicker':
+              if ($row->afsv_value === '') {
+                $fielddata = '';
+              } else {
+                $value_esc = htmlspecialchars($row->afsv_value,ENT_QUOTES);
+                $fielddata = "<span style='color: {$value_esc}'><font color='{$value_esc}'>&#9608;</font></span> $value_esc";
+              }
+            break;
             default:
-              $fielddata = htmlspecialchars($row->afsv_value,ENT_QUOTES);;
+              $fielddata = htmlspecialchars($row->afsv_value,ENT_QUOTES);
           }
           $data[$row->afsv_sub_id]['_field_'.$row->afsv_field_id] = $fielddata;
         }
