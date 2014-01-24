@@ -3,7 +3,7 @@ Contributors: cimatti
 Tags: contact, form, forms, contact form, contact forms, feedback, mail, email, ajax, attachment, curriculum, contact us, custom form, excel, form builder, web form, feedback, form manager, form to email, form to database, landing page, file upload, email form, customer request, spare parts, invitations, event forms, qtranslate, w3 total cache, drag and drop, form framework, form designer, form creator, php form builder
 Requires at least: 3.5
 Tested up to: 3.8
-Stable tag: 1.3
+Stable tag: 1.3.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -79,6 +79,11 @@ For more info, check out the following articles:
 
 
 == Changelog ==
+
+= 1.3.1 =
+* fixed validation of required fields with multiple values
+* show recipient of admin email in form list
+* changes in submissions list generation and export to allow usage by other plugins
 
 = 1.3 =
 * Spanish translation by Maria Ramos of [WebHostingHub](http://www.webhostinghub.com/)

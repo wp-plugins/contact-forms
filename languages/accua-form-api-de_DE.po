@@ -55,3 +55,5 @@ msgstr "Fehler: '%element%' ist ein notwendiges Feld"
 msgid "Error: '%element%' must contain an email address."
 msgstr "Fehler: '%element%' muss eine E-Mail Adresse enthalten"
 
+msgid "Please fill in all required fields"
+msgstr "Bitte füllen Sie alle Felder aus"

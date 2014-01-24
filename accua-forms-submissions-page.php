@@ -97,10 +97,15 @@ class Accua_Forms_Submissions_List_Table extends WP_List_Table {
       return $actions;
     }
     
-    function prepare_items($all=false) {
+    function prepare_items($all=false, $get = array()) {
         global $wpdb, $hook_suffix;
+        
+        if (!$get) {
+          $get = stripslashes_deep($_GET);
+        }
+        
         $per_page = 20;
-        $del = isset($_GET['del']) && $_GET['del']==1;
+        $del = isset($get['del']) && $get['del']==1;
         
         $this->active_items = $wpdb->get_var("SELECT COUNT(*) FROM `{$wpdb->prefix}accua_forms_submissions` WHERE afs_status >= 0");
         $this->del_items = $wpdb->get_var("SELECT COUNT(*) FROM `{$wpdb->prefix}accua_forms_submissions` WHERE afs_status < 0");
@@ -108,25 +113,33 @@ class Accua_Forms_Submissions_List_Table extends WP_List_Table {
         $filter = $filter_query_custom_field = "";
         $search = NULL;
         
-        if(isset($_GET['_wp_http_referer'])) {
-          foreach (explode('&', $_GET['_wp_http_referer']) as $coppia) {
+        if(isset($get['_wp_http_referer'])) {
+          foreach (explode('&', $get['_wp_http_referer']) as $coppia) {
             $param = explode("=", $coppia);
-            if($param[0]=='fid' && $param[1]!='-1') $filter .= " AND afs_form_id = '".$param[1]."' ";
-            if($param[0]=='pid' && $param[1]!='-1') $filter .= " AND afs_post_id = ".$param[1]. " ";
-            if($param[0]=='s' && $param[1]!='-1')  $search = $param[1];
+            if($param[0]=='fid' && $param[1]!='-1') $filter .= $wpdb->prepare(" AND afs_form_id = '%s' ", $param[1]);
+            if($param[0]=='pid' && $param[1]!='-1') $filter .= $wpdb->prepare(" AND afs_post_id = '%s' ", $param[1]);
+            if($param[0]=='s' && $param[1]!='-1')  $search = esc_sql($param[1]);
           }
         }
         
-        if(isset($_GET['fid']) && ($_GET['fid'])!=-1) {
-          $filter .= " AND afs_form_id = '".$_GET['fid']."' ";
+        if(isset($get['fid']) && ($get['fid'])!=-1) {
+          $filter .= $wpdb->prepare(" AND afs_form_id = '%s' ", $get['fid']);
         }
-        if(isset($_GET['pid']) && ($_GET['pid']!=-1)) {
-          $filter .= " AND afs_post_id = ".$_GET['pid']. " ";
+        if(isset($get['pid']) && ($get['pid']!=-1)) {
+          $filter .= $wpdb->prepare(" AND afs_post_id = %d ", $get['pid']);
         }
 
-        if(isset($_GET['s']) && ($_GET['s'])!=-1) {
-            $search = $_GET['s'];
+        if(isset($get['s']) && ($get['s'])!=-1) {
+            $search = esc_sql($get['s']);
         }
+        
+        if (isset($get['date_from']) && $get['date_from'] !== '') {
+          $filter .= $wpdb->prepare(" AND afs_submitted >= '%s' ", $get['date_from']);
+        }
+        if (isset($get['date_to']) && $get['date_to'] !== '') {
+          $filter .= $wpdb->prepare(" AND afs_submitted < '%s' ", $get['date_to']);
+        }
+        
         
         $columns = $this->get_columns();
         $hidden = get_hidden_columns($hook_suffix);

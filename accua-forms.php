@@ -3144,29 +3144,29 @@ add_action('wp_ajax_accua_forms_submission_page_save_excel', 'accua_forms_submis
 //add_action('wp_ajax_nopriv_accua_forms_submission_page_save_excel', 'accua_forms_submission_page_save_excel');
 
 function accua_forms_submission_page_save_excel() {
+  if (!current_user_can(10)){
+    header("HTTP/1.0 401 Access Denied");
+    //header("Status: 401 Access Denied");
+    die('You are not authorized to access this page.');
+  }
+  
   require_once('accua-forms-submissions-page.php');
   $listTable = new Accua_Forms_Submissions_List_Table();
   $listTable->prepare_items(true);
   $show_col = explode( ',', $_GET['accua_show_field']);
-  accua_forms_submission_page_save_excel_general($listTable,$show_col,'');
+  
+  header("Content-disposition: attachment; filename=downloads-report.xls");
+  header("Content-type: application/vnd.ms-excel");
+  accua_forms_submission_page_save_excel_general($listTable,$show_col);
   die('');
 }
 
 
 
-function accua_forms_submission_page_save_excel_general(Accua_Forms_Submissions_List_Table $listTable,array $show_col,$file_name='') {
-  
-  if (!current_user_can(10)){
-  header("HTTP/1.0 401 Access Denied");
-  //header("Status: 401 Access Denied");
-  die('You are not authorized to access this page.');
-  }
-
+function accua_forms_submission_page_save_excel_general(Accua_Forms_Submissions_List_Table $listTable,array $show_col,array $options=array()) {
   global $wpdb; 
   
   //creo il file excel  
-  header("Content-disposition: attachment; filename=downloads-report".$file_name.".xls");
-  header("Content-type: application/vnd.ms-excel");
   ?><html xmlns:o="urn:schemas-microsoft-com:office:office"
   xmlns:x="urn:schemas-microsoft-com:office:excel"
   xmlns="http://www.w3.org/TR/REC-html40">

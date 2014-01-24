@@ -92,7 +92,8 @@ class Accua_Forms_List_Table extends WP_List_Table {
             'title' =>  __('Title', 'accua-form-api'),
             'ID' => 'ID',
             'shortcode' => __('Shortcode', 'accua-form-api'),
-            'phpcode' => __('PHP code', 'accua-form-api'), 
+            'phpcode' => __('PHP code', 'accua-form-api'),
+            'adminemail' => __('Admin Email', 'accua-form-api'),
             'submissions' => __('Submissions', 'accua-form-api'),
         );
         return $columns;
@@ -194,6 +195,7 @@ class Accua_Forms_List_Table extends WP_List_Table {
         
         $forms_data = get_option('accua_forms_saved_forms', array());
         $forms_trash = get_option('accua_forms_trash_forms', array());
+        $forms_default = get_option('accua_forms_default_form_data',array());
         
         $this->active_items = count($forms_data);
         $this->del_items = count($forms_trash);
@@ -213,12 +215,19 @@ class Accua_Forms_List_Table extends WP_List_Table {
             $title = __('(no title)','accua-form-api');
           }
           
+          if (isset($form['admin_emails_to'])) {
+            $adminemail = $form['admin_emails_to'];
+          } else {
+            $adminemail = $forms_default['admin_emails_to'] . " (default)";
+          }
+          
           $data[$id] = array (
             'ID' => $id,
             'title' => $title,
             'submissions' => 0,
             'shortcode'=> $del?'':'[accua-form fid="'.$id.'"]',
             'phpcode'=> $del?'':"<?php accua_forms_include('$id'); ?>",
+            'adminemail' => $adminemail,
             'deleted' => $del,
           );
         }
@@ -240,6 +249,7 @@ class Accua_Forms_List_Table extends WP_List_Table {
                 'deleted' => true,
                 'shortcode' => '',
                 'phpcode' => '',
+                'adminemail' => '',
               );
               $this->del_items++;
             }

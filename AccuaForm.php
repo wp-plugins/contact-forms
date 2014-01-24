@@ -693,13 +693,21 @@ JS;
     
     $('.accuaforms-field-required', thisform).each(function(){
       var field = $(this);
+      var type = field.attr('type');
       
-      if (field.attr('type') === 'checkbox') {
-        if (field.is(':checked')) {
+      if (type === 'checkbox' || type === 'radio') {
+        if ($("[name='"+field.attr("name")+"']:checked", "#{$this->buildID}").length > 0) {
           return true;
         }
       } else {
-        if (! field.val().match(/^\s*$/)) {
+        var val = field.val();
+        if (typeof(val) == "string") {
+          if (! val.match(/^\s*$/)) {
+            return true;
+          }
+        } else if ((typeof(val) == "object") && val && (val.length > 0)) {
+          return true;
+        } else if (val) {
           return true;
         }
       }

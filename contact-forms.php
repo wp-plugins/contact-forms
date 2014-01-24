@@ -2,7 +2,7 @@
 /*
 Plugin Name: WordPress Contact Forms by Cimatti
 Description: Quickly create and publish forms in your WordPress powered website.
-Version: 1.3
+Version: 1.3.1
 Plugin URI: http://www.cimatti.it/wordpress/contact-forms/
 Author: Cimatti Consulting
 Author URI: http://www.cimatti.it
