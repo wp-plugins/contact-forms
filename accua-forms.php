@@ -1,7 +1,7 @@
 <?php
 add_action('admin_menu', 'accua_forms_menu', -95);
 function accua_forms_menu(){
-  $dashboard_admin_page=add_menu_page('Wordpress Contact Forms by Cimatti', 'Forms', 10, 'accua_forms', 'accua_dashboard_page', plugin_dir_url( __FILE__ ).'img/cimatti-16-icon.png');
+  $dashboard_admin_page=add_menu_page('Wordpress Contact Forms by Cimatti', 'Forms', 10, 'accua_forms', 'accua_dashboard_page', ACCUA_FORMS_DIR_URL.'img/cimatti-16-icon.png');
   add_action('load-'.$dashboard_admin_page, 'accua_dashboard_page_head');
     
   add_submenu_page('accua_forms', 'Wordpress Contact Forms by Cimatti', 'Dashboard', 10, "accua_forms", 'accua_dashboard_page');

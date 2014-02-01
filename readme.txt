@@ -2,8 +2,8 @@
 Contributors: cimatti
 Tags: contact, form, forms, contact form, contact forms, feedback, mail, email, ajax, attachment, curriculum, contact us, custom form, excel, form builder, web form, feedback, form manager, form to email, form to database, landing page, file upload, email form, customer request, spare parts, invitations, event forms, qtranslate, w3 total cache, drag and drop, form framework, form designer, form creator, php form builder
 Requires at least: 3.5
-Tested up to: 3.8
-Stable tag: 1.3.1
+Tested up to: 3.8.1
+Stable tag: 1.3.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -79,6 +79,10 @@ For more info, check out the following articles:
 
 
 == Changelog ==
+
+= 1.3.2 =
+* fixed visualization of color picker field
+* workaround to have multiple forms with recaptcha on the same page
 
 = 1.3.1 =
 * fixed validation of required fields with multiple values

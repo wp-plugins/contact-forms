@@ -14,12 +14,30 @@ require_once('PFBC/Form.php');
 require_once('AccuaForm.php');
 
 add_action('plugins_loaded', 'accua_form_init');
+add_action( 'wp_print_scripts', 'accua_form_init_scripts');
 
 define('ACCUA_FORM_API_PLUGIN_TEXTDOMAIN_PATH', dirname( plugin_basename( __FILE__ ) ) . '/languages/');
-function accua_form_init(){
+
+function accua_form_init_scripts(){
+  global $wp_scripts;
   wp_enqueue_script('jquery');
-  wp_enqueue_script('wp-color-picker');
   
+  if(!wp_script_is('wp-color-picker', 'registered')) {
+    if (!wp_script_is('iris', 'registered')) {
+      $wp_scripts->add( 'iris', '/wp-admin/js/iris.min.js', array( 'jquery-ui-draggable', 'jquery-ui-slider', 'jquery-touch-punch' ), false, 1 );
+    }
+    $wp_scripts->add( 'wp-color-picker', "/wp-admin/js/color-picker$suffix.js", array( 'iris' ), false, 1 );
+    $wp_scripts->localize( 'wp-color-picker', 'wpColorPickerL10n', array(
+        'clear' => __( 'Clear' ),
+        'defaultString' => __( 'Default' ),
+        'pick' => __( 'Select Color' ),
+        'current' => __( 'Current Color' ),
+    ) );
+  }
+  wp_enqueue_script('wp-color-picker');
+}
+function accua_form_init(){
+    
   wp_enqueue_style( 'wp-color-picker' );
   wp_enqueue_style( 'accua-forms-api-base', plugins_url('accua-form-api.css', __FILE__), array(), '2');
   

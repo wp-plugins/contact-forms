@@ -2,7 +2,7 @@
 /*
 Plugin Name: WordPress Contact Forms by Cimatti
 Description: Quickly create and publish forms in your WordPress powered website.
-Version: 1.3.1
+Version: 1.3.2
 Plugin URI: http://www.cimatti.it/wordpress/contact-forms/
 Author: Cimatti Consulting
 Author URI: http://www.cimatti.it
@@ -32,6 +32,7 @@ The full copy of the GNU General Public License is available here: http://www.gn
 */
 
 define('ACCUA_FORMS_DB_VERSION', '1');
+define('ACCUA_FORMS_DIR_URL', plugin_dir_url( __FILE__ ));
 
 require_once('accua-form-api.php');
 require_once('accua-forms.php');
@@ -213,6 +214,7 @@ function accua_dashboard_page()
 
 register_activation_hook(__FILE__, 'accua_forms_install');
 function accua_forms_install(){
+  load_plugin_textdomain( 'accua-form-api', false, ACCUA_FORM_API_PLUGIN_TEXTDOMAIN_PATH);
   $modified = false;
   $keys = get_option('accua_form_api_keys', array());
   if (!isset($keys['hash'])) {

@@ -9,7 +9,33 @@ class AccuaForm_Element_Captcha extends Element {
 	}	
 
 	public function render() {
-	  require_once(dirname(__FILE__) . "/../../PFBC/Resources/recaptchalib.php");
-		echo recaptcha_get_html($this->publicKey);
+	  $lang = $this->form->getLanguage();
+	  $field_id = $this->attributes["id"];
+	  $jspath = ACCUA_FORMS_DIR_URL . 'accua-recaptcha.js';
+	  $button_text = htmlspecialchars(__('Show Captcha', 'accua-form-api'), ENT_QUOTES);
+	  echo <<<EOT
+<script type="text/javascript">
+<!--
+if (typeof(accuaform_recaptcha_ajax_loaded) == "undefined" || !accuaform_recaptcha_ajax_loaded) {
+  document.write('<sc'+'ript type="text/javascript" src="//www.google.com/recaptcha/api/js/recaptcha_ajax.js"></sc'+'ript>');
+  document.write('<sc'+'ript type="text/javascript" src="$jspath"></sc'+'ript>');
+}
+// -->
+</script>
+<input type='button' value='$button_text' class='accua_forms_show_recaptcha_button' onclick='accua_forms_show_recaptcha("{$this->publicKey}", "{$field_id}", {lang: "{$lang}"})' />
+<div id="{$field_id}"></div>
+<script type="text/javascript">
+<!--
+accua_forms_show_recaptcha("{$this->publicKey}", "{$field_id}", {
+  lang: "{$lang}"
+});
+// -->
+</script>
+<noscript>
+  		<iframe src="https://www.google.com/recaptcha/api/noscript?k={$this->publicKey}" height="300" width="500" frameborder="0"></iframe><br/>
+  		<textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea>
+  		<input type="hidden" name="recaptcha_response_field" value="manual_challenge"/>
+</noscript>
+EOT;
 	}
 }
