@@ -47,8 +47,7 @@ CSS;
 		$elements = $this->form->getElements();
 		$elementSize = sizeof($elements);
 		$elementCount = 0;
-		for($e = 0; $e < $elementSize; ++$e) {
-		  $element = $elements[$e];
+		foreach ($elements as $element) {
 		  $elementWidth = $element->getWidth();
 		  if(!$element instanceof Element_Hidden && !$element instanceof Element_HTMLExternal && !$element instanceof Element_HTMLExternal) {
 		    if(!empty($elementWidth)) {

@@ -39,8 +39,8 @@ class Accua_Forms_Submissions_List_Table extends WP_List_Table {
     function column_cb($item){
         return sprintf(
             '<input type="checkbox" name="%1$s[]" value="%2$s" />',
-            /*$1%s*/ $this->_args['singular'],  //Let's simply repurpose the table's singular label ("movie")
-            /*$2%s*/ $item['ID']                //The value of the checkbox should be the record's id
+            /*$1%s*/ $this->_args['singular'],
+            /*$2%s*/ $item['ID']
         );
     }
     
@@ -173,20 +173,20 @@ class Accua_Forms_Submissions_List_Table extends WP_List_Table {
             afs_created AS created,
             afs_submitted AS submitted
             FROM `{$wpdb->prefix}accua_forms_submissions`
-            WHERE $afs_status_cond ".$filter."
+            WHERE {$afs_status_cond} {$filter}
             AND (
-            afs_ip LIKE '%%".$search."%%'
-            OR afs_uri LIKE '%%".$search."%%'
-            OR afs_referrer LIKE '%%".$search."%%'
-            OR afs_lang LIKE '%%".$search."%%'
-            OR afs_created LIKE '%%".$search."%%'
-            OR afs_submitted LIKE '%%".$search."%%'
-            OR afs_id LIKE '%%".$search."%%'
+            afs_ip LIKE '%{$search}%'
+            OR afs_uri LIKE '%{$search}%'
+            OR afs_referrer LIKE '%{$search}%'
+            OR afs_lang LIKE '%{$search}%'
+            OR afs_created LIKE '%{$search}%'
+            OR afs_submitted LIKE '%{$search}%'
+            OR afs_id LIKE '%{$search}%'
             OR afs_id
             IN (
               SELECT DISTINCT (afsv_sub_id)
               FROM `{$wpdb->prefix}accua_forms_submissions_values`
-              WHERE afsv_value LIKE '%%".$search."%%')
+              WHERE afsv_value LIKE '%{$search}%')
              )
             ORDER BY afs_id DESC";
         }
@@ -203,7 +203,7 @@ class Accua_Forms_Submissions_List_Table extends WP_List_Table {
           afs_created AS created,
           afs_submitted AS submitted
           FROM `{$wpdb->prefix}accua_forms_submissions`
-          WHERE $afs_status_cond ".$filter."
+          WHERE {$afs_status_cond} {$filter}
           ORDER BY afs_id DESC";
         }
 

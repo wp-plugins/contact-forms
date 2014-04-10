@@ -1008,20 +1008,20 @@ accua_forms_saved_form_data: <?php echo htmlspecialchars(print_r($form_data, tru
         <div class="inside" id="dashboard_right_now">
           <div id="accua_form_admin_emails_to" class="label_input">
             <label><?php _e( 'To', 'accua-form-api'); ?></label>
-            <div class="default_value"><?php echo $default_form_data['admin_emails_to']; ?></div>
+            <div class="default_value"><?php echo htmlspecialchars($default_form_data['admin_emails_to']); ?></div>
             <input class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['admin_emails_to'], ENT_QUOTES) ?>" />
             <input name="accua_form_admin_emails_to" class="accua_form_check_override" type="checkbox" value="1" <?php if (isset($form_overrided_data['admin_emails_to'])) {echo 'checked="checked" ';} ?>/><?php _e( 'Customize', 'accua-form-api'); ?> 
           </div>
           <div id="accua_form_emails_bcc" class="label_input">
             <label><?php _e( 'Bcc', 'accua-form-api'); ?></label>
-            <div class="default_value"><?php echo $default_form_data['emails_bcc']; ?></div>
+            <div class="default_value"><?php echo htmlspecialchars($default_form_data['emails_bcc']); ?></div>
             <input class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['emails_bcc'], ENT_QUOTES) ?>" />
             <input name ="accua_form_emails_bcc" class="accua_form_check_override" type="checkbox" value="1" <?php if (isset($form_overrided_data['emails_bcc'])) {echo 'checked="checked" ';} ?>/><?php _e( 'Customize', 'accua-form-api'); ?> 
           </div>
           
           <div id="accua_form_admin_emails_subject" class="label_input">
             <label><?php _e( 'Subject', 'accua-form-api'); ?></label>
-            <div class="default_value"><?php echo $default_form_data['admin_emails_subject']; ?></div>
+            <div class="default_value"><?php echo htmlspecialchars($default_form_data['admin_emails_subject']); ?></div>
             <input class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['admin_emails_subject'], ENT_QUOTES) ?>" />
             <input name="accua_form_admin_emails_subject" class="accua_form_check_override" type="checkbox" value="1" <?php if (isset($form_overrided_data['admin_emails_subject'])) {echo 'checked="checked" ';} ?>/><?php _e( 'Customize', 'accua-form-api'); ?> 
           </div>
@@ -1047,13 +1047,13 @@ accua_forms_saved_form_data: <?php echo htmlspecialchars(print_r($form_data, tru
         <div class="inside" id="dashboard_right_now">
           <div id="accua_form_emails_from" class="label_input">
             <label><?php _e( 'From', 'accua-form-api'); ?></label>
-            <div class="default_value"><?php echo $default_form_data['emails_from']; ?></div>
+            <div class="default_value"><?php echo htmlspecialchars($default_form_data['emails_from']); ?></div>
             <input class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['emails_from'], ENT_QUOTES) ?>" />
             <input name="accua_form_emails_from" class="accua_form_check_override" type="checkbox" value="1" <?php if (isset($form_overrided_data['emails_from'])) {echo 'checked="checked" ';} ?>/><?php _e( 'Customize', 'accua-form-api'); ?> 
           </div>
           <div id="accua_form_confirmation_emails_subject" class="label_input">
             <label><?php _e( 'Subject', 'accua-form-api'); ?></label>
-            <div class="default_value"><?php echo $default_form_data['confirmation_emails_subject']; ?></div>
+            <div class="default_value"><?php echo htmlspecialchars($default_form_data['confirmation_emails_subject']); ?></div>
             <input class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['confirmation_emails_subject'], ENT_QUOTES) ?>" />
             <input name="accua_form_confirmation_emails_subject" class="accua_form_check_override" type="checkbox" value="1" <?php if (isset($form_overrided_data['confirmation_emails_subject'])) {echo 'checked="checked" ';} ?>/><?php _e( 'Customize', 'accua-form-api'); ?> 
           </div>
@@ -2438,35 +2438,57 @@ function accua_forms_form_generate($baseid, $form) {
         
         switch ($field_data['type']) {
           case 'textarea':
-            $element = new Element_Textarea($istance_data['label'], $istance_data['istance_id'], $field_properties+array('cols' => '50'));
+            $element = new Element_Textarea($istance_data['label'], $istance_data['istance_id'], $field_properties+array('cols' => '50', 'value'=>$istance_data['default_value']));
           break;
           case 'hidden':
             $element = new Element_Hidden($istance_data['istance_id'], $istance_data['default_value']);
           break;
           case 'checkbox':
-            $val = empty($istance_data['default_value'])?'1':$istance_data['default_value'];
             $lab = $istance_data['label'];
             if (!empty($istance_data['required'])) {
               $lab .= ' <strong>*</strong>';
             }
-            $element = new AccuaForm_Element_Checkbox('', $istance_data['istance_id'], array($val => $lab));
+            if ($allowed_values) {
+              reset($allowed_values);
+              $val = (string) key($allowed_values);
+              $defval = trim($istance_data['default_value']);
+            } else if ($istance_data['default_value'] == '1') {
+              $defval = $val = '1';
+            } else {
+              $val = empty($istance_data['default_value'])?'1':$istance_data['default_value'];
+            }
+            $element = new AccuaForm_Element_Checkbox('', $istance_data['istance_id'], array($val => $lab), array('value' => $defval));
           break;
           case 'select':
             if (!isset($allowed_values[''])) {
               $allowed_values = array('' => '') + $allowed_values;
             }
-            $element = new Element_Select($istance_data['label'], $istance_data['istance_id'], $allowed_values, $field_properties);
+            $defval = trim($istance_data['default_value']);
+            $element = new Element_Select($istance_data['label'], $istance_data['istance_id'], $allowed_values, $field_properties+array('value'=>$defval));
           break;
           case 'radio':
-            $element = new AccuaForm_Element_Radio($istance_data['label'], $istance_data['istance_id'], $allowed_values);
+            $defval = trim($istance_data['default_value']);
+            $element = new AccuaForm_Element_Radio($istance_data['label'], $istance_data['istance_id'], $allowed_values, array('value'=>$defval));
           break;
           case 'multiselect':
-            $element = new Element_Select($istance_data['label'], $istance_data['istance_id'], $allowed_values, $field_properties+array('multiple' => true));
+            $defval = explode('|', $istance_data['default_value']);
+            foreach ($defval as $k => $v) {
+              $defval[$k] = trim($v);
+            }
+            $element = new Element_Select($istance_data['label'], $istance_data['istance_id'], $allowed_values, $field_properties+array('multiple' => true, 'value'=>$defval));
           break;
           case 'multicheckbox':
-            $element = new AccuaForm_Element_Checkbox($istance_data['label'], $istance_data['istance_id'], $allowed_values);
+            $defval = explode('|', $istance_data['default_value']);
+            foreach ($defval as $k => $v) {
+              $defval[$k] = trim($v);
+            }
+            $element = new AccuaForm_Element_Checkbox($istance_data['label'], $istance_data['istance_id'], $allowed_values, array('value'=>$defval));
           case 'post-multicheckbox':
-            $element = new AccuaForm_Element_Checkbox($istance_data['label'], $istance_data['istance_id'], $allowed_values);
+            $defval = explode('|', $istance_data['default_value']);
+            foreach ($defval as $k => $v) {
+              $defval[$k] = trim($v);
+            }
+            $element = new AccuaForm_Element_Checkbox($istance_data['label'], $istance_data['istance_id'], $allowed_values, array('value'=>$defval));
           break;
           case 'file':
             $fdata = array();
@@ -2488,14 +2510,14 @@ function accua_forms_form_generate($baseid, $form) {
           break;
           case 'email':
           case 'autoreply_email':
-            $element = new AccuaForm_Element_Email($istance_data['label'], $istance_data['istance_id'], $field_properties);
+            $element = new AccuaForm_Element_Email($istance_data['label'], $istance_data['istance_id'], $field_properties+array('value'=>$istance_data['default_value']));
             $element->setValidation(new Validation_Email(
               str_replace('%element%', $istance_data['label'], __("Attention: '%element%' must contain an email address.", 'accua-form-api'))
               ));
             //"Errore: '{$istance_data['label']}' deve contenere un indirizzo email valido."
           break;
           case 'colorpicker':
-            $element = new AccuaForm_Element_ColorPicker($istance_data['label'], $istance_data['istance_id'], $field_properties);
+            $element = new AccuaForm_Element_ColorPicker($istance_data['label'], $istance_data['istance_id'], $field_properties+array('value'=>$istance_data['default_value']));
           break;
           case 'fieldset-begin':
             if ($fieldset_open) {
@@ -2519,45 +2541,46 @@ function accua_forms_form_generate($baseid, $form) {
             $element = new AccuaForm_Element_Captcha ($istance_data['label'], array("description" => ""));
           break;
 		      case 'password':
-            $element = new Element_Password($istance_data['label'], $istance_data['istance_id'], $field_properties);
+            $element = new Element_Password($istance_data['label'], $istance_data['istance_id'], $field_properties+array('value'=>$istance_data['default_value']));
 			    break;
 		      case 'password-and-confirm':
 			      $id_2 = "___{$istance_data['istance_id']}___confirmpass";
-            $element = new Element_Password(__("Password", 'accua-form-api'), $istance_data['istance_id'], $field_properties);
-			      $element_conf = new Element_Password(__("Confirm password", 'accua-form-api'), $id_2, $field_properties);
+            $element = new Element_Password(__("Password", 'accua-form-api'), $istance_data['istance_id'], $field_properties+array('value'=>$istance_data['default_value']));
+			      $element_conf = new Element_Password(__("Confirm password", 'accua-form-api'), $id_2, $field_properties+array('value'=>$istance_data['default_value']));
             $element_conf->setValidation(new AccuaForm_Validation_Password()); 
           break;
           //case 'textfield':
           default:
-            $element = new Element_Textbox($istance_data['label'], $istance_data['istance_id'], $field_properties);
+            $element = new Element_Textbox($istance_data['label'], $istance_data['istance_id'], $field_properties+array('value'=>$istance_data['default_value']));
           break;
         }
-        
-        if (!empty($istance_data['required'])) {
-          $element->setClass('accuaforms-field-required');
-	    	  if($field_data['type']!='password-and-confirm') {
-			      $element->setValidation(new Validation_Required(
-				      str_replace('%element%', $istance_data['label'], __("Attention: '%element%' is a required field.", 'accua-form-api'))
-				    ));
-				  } else {
-		        $element->setValidation(new Validation_Required(
-				      str_replace('%element%', $istance_data['label'], __("Attention: Passwords are required fields.", 'accua-form-api'))
-				    ));
-				  }
-        }
-        
-        if ($elementName = $element->getName()) {
-          $element->setClass('accuaform-fieldname-'.$elementName);
-        }
-        
-        if ($field_data['type']) {
-          $element->setClass('accuaform-fieldtype-'.$field_data['type']);
-        }
-		
-        $form->addElement($element);
-		    if($element_conf!=NULL) {
-			    $form->addElement($element_conf);
-			    $element_conf=NULL;
+        if ($element) {
+          if (!empty($istance_data['required'])) {
+            $element->setClass('accuaforms-field-required');
+  	    	  if($field_data['type']!='password-and-confirm') {
+  			      $element->setValidation(new Validation_Required(
+  				      str_replace('%element%', $istance_data['label'], __("Attention: '%element%' is a required field.", 'accua-form-api'))
+  				    ));
+  				  } else {
+  		        $element->setValidation(new Validation_Required(
+  				      str_replace('%element%', $istance_data['label'], __("Attention: Passwords are required fields.", 'accua-form-api'))
+  				    ));
+  				  }
+          }
+          
+          if ($elementName = $element->getName()) {
+            $element->setClass('accuaform-fieldname-'.$elementName);
+          }
+          
+          if ($field_data['type']) {
+            $element->setClass('accuaform-fieldtype-'.$field_data['type']);
+          }
+  		
+          $form->addElement($element);
+  		    if($element_conf!=NULL) {
+  			    $form->addElement($element_conf);
+  			    $element_conf=NULL;
+  		    }
 		    }
       }
       if ($fieldset_open) {

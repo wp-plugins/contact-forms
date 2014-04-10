@@ -26,6 +26,7 @@ class AccuaForm extends Form {
   protected $original_l10n = null;
   protected $forced_language = false;
   protected $elementsByName = array();
+  protected $elementCounter = 0;
   
   public function force_language() {
     if ((!$this->forced_language) && $this->language && function_exists('qtrans_getLanguage')) {
@@ -44,7 +45,7 @@ class AccuaForm extends Form {
         load_default_textdomain();
         load_plugin_textdomain( 'accua-form-api', false, ACCUA_FORM_API_PLUGIN_TEXTDOMAIN_PATH);
         require_once( ABSPATH . WPINC . '/locale.php' );
-        $GLOBALS['wp_locale'] =& new WP_Locale();
+        $GLOBALS['wp_locale'] = new WP_Locale();
         $GLOBALS['wp_locale']->register_globals();
         
         $this->forced_language = true;
@@ -91,6 +92,11 @@ class AccuaForm extends Form {
     if ($name) {
       $this->elementsByName[$name] = $element;
     }
+		$id = $element->getID();
+		if(empty($id)) {
+			$element->setID($this->attributes["id"] . "-element-" . $this->elementCounter);
+		}
+		$this->elementCounter++;
     return parent::addElement($element);
   }
   
@@ -100,6 +106,20 @@ class AccuaForm extends Form {
     } else {
       return null;
     }
+  }
+  
+  public function removeElement($element) {
+    foreach ($this->elements as $k => $e) {
+      if ($e === $element) {
+        $name = $element->getName();
+        if ($name) {
+          unset ($this->elementsByName[$name]);
+        }
+        unset($this->elements[$k]);
+        return true;
+      }
+    }
+    return false;
   }
   
   public static function sessionID() {

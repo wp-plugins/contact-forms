@@ -2,8 +2,8 @@
 Contributors: cimatti
 Tags: contact, form, forms, contact form, contact forms, feedback, mail, email, ajax, attachment, curriculum, contact us, custom form, excel, form builder, web form, feedback, form manager, form to email, form to database, landing page, file upload, email form, customer request, spare parts, invitations, event forms, qtranslate, w3 total cache, drag and drop, form framework, form designer, form creator, php form builder
 Requires at least: 3.5
-Tested up to: 3.8.1
-Stable tag: 1.3.2
+Tested up to: 3.8.2
+Stable tag: 1.3.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -79,6 +79,12 @@ For more info, check out the following articles:
 
 
 == Changelog ==
+
+= 1.3.3 =
+* improved checkboxes, select and radio definition to allow pre-selected options
+* fixed PHP 5.5 incompatibility issue. Now the plugin works with PHP from version 5.2 to 5.5
+* fixed default value for email, colorpicker and password fields
+* allowed removal of elements by a filter after the form generation
 
 = 1.3.2 =
 * fixed visualization of color picker field

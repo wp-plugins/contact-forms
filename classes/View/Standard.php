@@ -5,36 +5,48 @@ class AccuaForm_View_Standard extends View {
 		$this->form->getError()->render();
 
 		$elements = $this->form->getElements();
-		$elementSize = sizeof($elements);
 		$elementCount = 0;
-		for($e = 0; $e < $elementSize; ++$e) {
-			$element = $elements[$e];
-
-			if($element instanceof Element_Hidden || $element instanceof Element_HTMLExternal || $element instanceof AccuaForm_Element_FieldsetBegin || $element instanceof AccuaForm_Element_FieldsetEnd) {
+		$inButtonGroup = false;
+		
+		foreach($elements as $element) {
+			if($element instanceof Element_Hidden || $element instanceof Element_HTMLExternal) {
         $element->render();
 		  } elseif($element instanceof Element_Button) {
-        if($e == 0 || !$elements[($e - 1)] instanceof Element_Button)
-            echo '<div class="pfbc-element pfbc-buttons">';
+		    if (!$inButtonGroup) {
+		      echo '<div class="pfbc-element pfbc-buttons">';
+		      $inButtonGroup = true;
+		    }
         $element->render();
-        if(($e + 1) == $elementSize || !$elements[($e + 1)] instanceof Element_Button)
-            echo '</div>';
       } else {
-				echo '<div class="pfbc-element-', $elementCount, ' pfbc-element">', $element->getPreHTML();
-				$this->renderLabel($element);
-				if ($element instanceof Element_HTML) {
-				  $element->render();
-				} else {
-				  echo '<div class="pfbc-fieldwrap">';
-			    $element->render();
-			    echo '</div>';
-				}
-				echo $element->getPostHTML(), '<div class="pfbc-elementbottom"></div></div>';
-				++$elementCount;
+        if ($inButtonGroup) {
+          echo '</div>';
+          $inButtonGroup = false;
+        }
+        if ($element instanceof AccuaForm_Element_FieldsetBegin || $element instanceof AccuaForm_Element_FieldsetEnd) {
+          $element->render();
+        } else {
+	  			echo '<div class="pfbc-element-', $elementCount, ' pfbc-element">', $element->getPreHTML();
+		  		$this->renderLabel($element);
+			  	if ($element instanceof Element_HTML) {
+				    $element->render();
+				  } else {
+				    echo '<div class="pfbc-fieldwrap">';
+  			    $element->render();
+	  		    echo '</div>';
+		  		}
+				  echo $element->getPostHTML(), '<div class="pfbc-elementbottom"></div></div>';
+				  ++$elementCount;
+        }
 			}
+		}
+		
+		if ($inButtonGroup) {
+		  echo '</div>';
+		  $inButtonGroup = false;
 		}
 
 		echo '</form>';
-    }
+  }
 
   /*This method encapsulates the various pieces that are included in an element's label.*/
   protected function renderLabel($element) {
@@ -73,10 +85,8 @@ class AccuaForm_View_Standard extends View {
 CSS;
 		
 		$elements = $this->form->getElements();
-		$elementSize = sizeof($elements);
 		$elementCount = 0;
-		for($e = 0; $e < $elementSize; ++$e) {
-		  $element = $elements[$e];
+		foreach ($elements as $element) {
 		  $elementWidth = $element->getWidth();
 		  if(!$element instanceof Element_Hidden && !$element instanceof Element_HTMLExternal && !$element instanceof Element_HTMLExternal) {
 		    if(!empty($elementWidth)) {
