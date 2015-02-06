@@ -297,6 +297,7 @@ function accua_forms_save_form_settings() {
     'success_message_no_message',
     'error_message',
     'error_message_no_message',
+    'emails_from_name',
     'emails_from',
     'admin_emails_to',
     'emails_bcc',
@@ -555,6 +556,7 @@ EOT;
     break;
   }
   $adminurl = admin_url();
+  
   return <<<EOT
 <div class="widget ui-draggable" id="widget-{$i}_{$istance_data['istance_id']}" $hidden>  <div class="widget-top">
   <div class="widget-title-action">
@@ -787,6 +789,17 @@ function accua_forms_edit_page($fid) {
   $fid_esc = htmlspecialchars($fid, ENT_QUOTES);
   
   $adminurl = admin_url();
+  
+  global $wp_version;
+  if (version_compare($wp_version, '4') >= 0) {
+?>
+<style>
+#widgets-right .accua-form-widget-scroll-wrapper .widget.ui-draggable {
+        height: auto !important;
+}
+</style>
+<?php
+  }
   
 ?>
 <div id="accua_forms_edit_page" class="accua_forms_admin_page wrap">
@@ -1045,8 +1058,14 @@ accua_forms_saved_form_data: <?php echo htmlspecialchars(print_r($form_data, tru
       <div class="postbox ">
         <h3 class="hndle"><span><?php _e('4. Email confirmation to the person who completed the form', 'accua-form-api'); ?></span></h3>
         <div class="inside" id="dashboard_right_now">
+          <div id="accua_form_emails_from_name" class="label_input">
+            <label><?php _e( 'From name', 'accua-form-api'); ?></label>
+            <div class="default_value"><?php echo htmlspecialchars($default_form_data['emails_from_name']); ?></div>
+            <input class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['emails_from_name'], ENT_QUOTES) ?>" />
+            <input name="accua_form_emails_from_name" class="accua_form_check_override" type="checkbox" value="1" <?php if (isset($form_overrided_data['emails_from_name'])) {echo 'checked="checked" ';} ?>/><?php _e( 'Customize', 'accua-form-api'); ?> 
+          </div>
           <div id="accua_form_emails_from" class="label_input">
-            <label><?php _e( 'From', 'accua-form-api'); ?></label>
+            <label><?php _e( 'From email', 'accua-form-api'); ?></label>
             <div class="default_value"><?php echo htmlspecialchars($default_form_data['emails_from']); ?></div>
             <input class="accua_form_value" type="text" value="<?php echo htmlspecialchars($form_data['emails_from'], ENT_QUOTES) ?>" />
             <input name="accua_form_emails_from" class="accua_form_check_override" type="checkbox" value="1" <?php if (isset($form_overrided_data['emails_from'])) {echo 'checked="checked" ';} ?>/><?php _e( 'Customize', 'accua-form-api'); ?> 
@@ -1317,7 +1336,7 @@ jQuery(document).ready(function($){
        }
   ); 
   $.each(
-      ['emails_from','admin_emails_to','emails_bcc','admin_emails_subject','confirmation_emails_subject','style_margin','style_border_color','style_border_width','style_border_radius','style_background_color','style_padding','style_color','style_font_size','style_field_spacing','style_field_border_color','style_field_border_width','style_field_border_radius','style_field_background_color','style_field_padding','style_field_color','style_submit_border_color','style_submit_border_width','style_submit_border_radius','style_submit_background_color','style_submit_padding','style_submit_color','style_submit_font_size'],
+      ['emails_from_name','emails_from','admin_emails_to','emails_bcc','admin_emails_subject','confirmation_emails_subject','style_margin','style_border_color','style_border_width','style_border_radius','style_background_color','style_padding','style_color','style_font_size','style_field_spacing','style_field_border_color','style_field_border_width','style_field_border_radius','style_field_background_color','style_field_padding','style_field_color','style_submit_border_color','style_submit_border_width','style_submit_border_radius','style_submit_background_color','style_submit_padding','style_submit_color','style_submit_font_size'],
       function(i,key){
         if(!$('#accua_form_'+key+' .accua_form_check_override').is(':checked')) {
           jQuery('#accua_form_'+key+' .default_value').show();
@@ -1840,6 +1859,7 @@ function accua_forms_settings_page() {
   $empty_form_data = array(
     'success_message' => '',
     'error_message' => '',
+    'emails_from_name' => '',
     'emails_from' => '',
     'admin_emails_to' => '',
     'emails_bcc' => '',
@@ -1975,8 +1995,12 @@ function accua_forms_settings_page() {
       <div class="postbox ">
         <h3 class="hndle"><span><?php _e('4. Email confirmation to the person who completed the form', 'accua-form-api'); ?></span></h3>
         <div class="inside" id="dashboard_right_now">
+          <div id="accua_form_emails_from_name" class="label_input">
+            <label><?php _e( 'From name', 'accua-form-api'); ?></label>
+            <input class="accua_form_value" name="emails_from_name" type="text" value="<?php echo htmlspecialchars($form_data['emails_from_name'], ENT_QUOTES) ?>" />
+          </div>
           <div id="accua_form_emails_from" class="label_input">
-            <label><?php _e( 'From', 'accua-form-api'); ?></label>
+            <label><?php _e( 'From email', 'accua-form-api'); ?></label>
             <input class="accua_form_value" name="emails_from" type="text" value="<?php echo htmlspecialchars($form_data['emails_from'], ENT_QUOTES) ?>" />
           </div>
           <br clear="all" />
@@ -2186,6 +2210,7 @@ function _accua_forms_get_form_data($fid = false, $return_empty = true, $restore
     'title' => '',
     'success_message' => '',
     'error_message' => '',
+    'emails_from_name' => '',
     'emails_from' => '',
     'admin_emails_to' => '',
     'emails_bcc' => '',
@@ -2456,6 +2481,7 @@ function accua_forms_form_generate($baseid, $form) {
               $defval = $val = '1';
             } else {
               $val = empty($istance_data['default_value'])?'1':$istance_data['default_value'];
+              $defval = '';
             }
             $element = new AccuaForm_Element_Checkbox('', $istance_data['istance_id'], array($val => $lab), array('value' => $defval));
           break;
@@ -2763,7 +2789,9 @@ function accua_forms_form_submission_handler($submittedID, $submittedData, $form
           'default_value' => $field_data['default_value'],
           'allowed_values' => $field_data['allowed_values'],
         );
-                
+        
+        $type = $field_data['type'];
+        
         switch ($field_data['type']) {
           case 'checkbox':
           case 'submit':
@@ -2780,25 +2808,28 @@ function accua_forms_form_submission_handler($submittedID, $submittedData, $form
           break;
           case 'multiselect':
           case 'multicheckbox':
-            $replace_map[$istance_data['istance_id']] = implode(', ',$value);
-            $value = implode('|',$value);
+          	if (is_array($value)) {
+            	$replace_map[$istance_data['istance_id']] = implode(', ',$value);
+            	$value = implode('|',$value);
+          	} else {
+          	  $replace_map[$istance_data['istance_id']] = $value = '';
+          	} 
           break;
           case 'post-multicheckbox':
-            $el = $form->getElementByName($istance_id);
-            $opts = $el->getOptions();
-            $value2 = array();
-            foreach ($value as $val) {
-							if (isset($opts[$val])) {
-              	$value2[] = $val . ': ' . trim(preg_replace('/[\s\n\r]+/', ' ', $opts[$val]));
-              }
+          	if (is_array($value)) {
+	            $el = $form->getElementByName($istance_id);
+	            $opts = $el->getOptions();
+	            $value2 = array();
+	            foreach ($value as $val) {
+								if (isset($opts[$val])) {
+	              	$value2[] = $val . ': ' . trim(preg_replace('/[\s\n\r]+/', ' ', $opts[$val]));
+	              }
+	            }
+	            $replace_map[$istance_data['istance_id']] = $value = implode("\n", $value2);
+            } else {
+              $replace_map[$istance_data['istance_id']] = $value = '';
             }
-            $replace_map[$istance_data['istance_id']] = $value = implode("\n", $value2);
           break;
-          /*
-          case 'file':
-            //URL to file, or attach
-          break;
-           */
           case 'autoreply_email':
             if ($value !== '') {
               $replace_map['__autoreply_email_raw'][] = $value;
@@ -2819,6 +2850,16 @@ function accua_forms_form_submission_handler($submittedID, $submittedData, $form
             }
             $replace_map[$istance_data['istance_id']] = $value;
             $replace_map['__download_'.$istance_data['istance_id']] = $file_download_url;
+          break;
+          case 'password':
+          case 'password-and-confirm':
+            $value = trim($value);
+            $replace_map[$istance_data['istance_id']] = $value;
+            $type = 'hashed-password';
+            if ($value !== '') {
+              $value = wp_hash_password($value);
+            }
+            $replace_map['__hashed_'.$istance_data['istance_id']] = $value;
           break;
           default:
             $replace_map[$istance_data['istance_id']] = $value;
@@ -2850,6 +2891,9 @@ function accua_forms_form_submission_handler($submittedID, $submittedData, $form
             }
             $replace_map['__submitted_html_raw'][$istance_data['istance_id']] = "<strong>{$istance_data['istance_id']}</strong></td><td class='valori_submitted'>$value_html";
           break;
+          case 'password':
+          case 'password-and-confirm':
+          break;
           default:
             $replace_map['__submitted_txt_raw'][$istance_data['istance_id']] = "{$istance_data['istance_id']}\t$value";
             $replace_map['__submitted_json_raw'][$istance_data['istance_id']] = $value;
@@ -2861,7 +2905,7 @@ function accua_forms_form_submission_handler($submittedID, $submittedData, $form
           array (
             'afsv_sub_id' => $submission_id,
             'afsv_field_id' => $istance_data['istance_id'],
-            'afsv_type' => $field_data['type'],
+            'afsv_type' => $type,
             'afsv_value' => $value,
           ),
           array('%d','%s','%s','%s')
@@ -2904,6 +2948,7 @@ function accua_forms_form_submission_handler($submittedID, $submittedData, $form
       $form_data_replaced = array();
       
       $settings = array(
+        'emails_from_name',
         'emails_from',
         'admin_emails_to',
         'emails_bcc',
@@ -2928,9 +2973,15 @@ function accua_forms_form_submission_handler($submittedID, $submittedData, $form
       
       $header = array("Content-Type: text/html; charset=".get_option('blog_charset'));
     
-      
-      if ($form_data_replaced['emails_from']) {
-        $header[] = 'From: '.$form_data_replaced['emails_from'];
+      $emails_from = trim($form_data_replaced['emails_from']);
+      if (strpos($emails_from, '@') !== false) {
+        if ((strpos($emails_from, '<') === false) && is_email($emails_from)) {
+          $emails_from_name = trim($form_data_replaced['emails_from_name']);
+          if ($emails_from_name !== '') {
+            $emails_from = "=?" . get_bloginfo('charset') . "?B?" . base64_encode($emails_from_name) . "?= <$emails_from>";
+          }
+        }
+        $header[] = 'From: '.$emails_from;
       }
       
       if ($form_data_replaced['emails_bcc']) {
@@ -2996,6 +3047,20 @@ function accua_forms_get_submission_data($subid, $options = array()){
       $submitted[10] = 'T';
       $submitted.='.00+00:00';
       $submitted = strtotime($submitted);
+      if ($data->afs_stats) {
+        $stats = json_decode($data->afs_stats, true);
+        if (!$stats) {
+          $stats = array();
+        }
+      } else {
+        $stats = array();
+      }
+      $stats += array(
+        'user_agent' => '',
+        'platform' => '',
+        'tentatives' => '',
+        'submit_method' => '',
+      );
       $ret += array(
         '__fid' => $data->afs_form_id,
         '__subid' => $subid,
@@ -3010,6 +3075,10 @@ function accua_forms_get_submission_data($subid, $options = array()){
         '__submitted' => $submitted,
         '__submitted_day' => date('l j F Y', $submitted),
         '__submitted_hour' => date('G:i', $submitted),
+        '__user_agent' => $stats['user_agent'],
+        '__platform' => $stats['platform'],
+        '__tentatives' => $stats['tentatives'],
+        '__submit_method' => $stats['submit_method'],
       );
     }
   }
@@ -3027,7 +3096,7 @@ function accua_forms_get_submission_data($subid, $options = array()){
           $fieldid = rawurlencode($row->afsv_field_id);
           $filename = rawurlencode($row->afsv_value);
           $url = admin_url('admin-ajax.php') . "?action=accua_forms_download_submitted_file&subid={$row->afsv_sub_id}&field={$fieldid}&file={$filename}";
-          if ($options['file_format'] == 'url'){
+          if ($options['file_format'] == 'link'){
             $url = htmlspecialchars($url,ENT_QUOTES);
             $filename = htmlspecialchars($row->afsv_value,ENT_QUOTES);
             $fielddata = "<a href='{$url}' target='_blank'>{$filename}</a>";

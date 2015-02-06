@@ -30,6 +30,8 @@ if (!class_exists('AccuaConditionalReplacer')) {
         $this->replace = array();
         $this->matches = array();
         foreach ($this->map as $s => $r) {
+          $s = (string) $s;
+          $r = (string) $r;
           $this->search[] = '{'.$s.'}';
           $this->replace[] = $r;
           if (trim($r) !== '') {

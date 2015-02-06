@@ -2,7 +2,7 @@
 /*
 Plugin Name: WordPress Contact Forms by Cimatti
 Description: Quickly create and publish forms in your WordPress powered website.
-Version: 1.3.3
+Version: 1.3.4
 Plugin URI: http://www.cimatti.it/wordpress/contact-forms/
 Author: Cimatti Consulting
 Author URI: http://www.cimatti.it
@@ -31,7 +31,7 @@ The full copy of the GNU General Public License is available here: http://www.gn
 
 */
 
-define('ACCUA_FORMS_DB_VERSION', '1');
+define('ACCUA_FORMS_DB_VERSION', '2');
 define('ACCUA_FORMS_DIR_URL', plugin_dir_url( __FILE__ ));
 
 require_once('accua-form-api.php');
@@ -270,66 +270,71 @@ function accua_forms_install(){
   ) $charset_collate;";
   dbDelta($sql);
   
+  
+  $old_db_version = (int) get_option('accua_forms_db_version', 0);
   $avail_fields = get_option('accua_forms_avail_fields', array());
+  
   if (!is_array($avail_fields)) {
     $avail_fields = array();
   }
-  $avail_fields += array(
-    'first_name' => array(
-      'id' => 'first_name',
-      'name' => 'First Name',
-      'type' => 'textfield',
-      'description' => '',
-      'default_value' =>  '',
-      'allowed_values' =>  '',
-    ),
-    'last_name' => array(
-      'id' => 'last_name',
-      'name' => 'Last Name',
-      'type' => 'textfield',
-      'description' => '',
-      'default_value' =>  '',
-      'allowed_values' =>  '',
-    ),
-    'email' => array(
-      'id' => 'email',
-      'name' => 'Email',
-      'type' => 'autoreply_email',
-      'description' => '',
-      'default_value' =>  '',
-      'allowed_values' =>  '',
-    ),
-    'address' => array(
-      'id' => 'address',
-      'name' => 'Address',
-      'type' => 'textfield',
-      'description' => '',
-      'default_value' =>  '',
-      'allowed_values' =>  '',
-    ),
-    'city' => array(
-      'id' => 'city',
-      'name' => 'City',
-      'type' => 'textfield',
-      'description' => '',
-      'default_value' =>  '',
-      'allowed_values' =>  '',
-    ),
-    'state_province' => array(
-      'id' => 'state_province',
-      'name' => 'State/Province',
-      'type' => 'textfield',
-      'description' => '',
-      'default_value' =>  '',
-      'allowed_values' =>  '',
-    ),
-    'country' => array(
-      'id' => 'country',
-      'name' => 'Country',
-      'type' => 'select',
-      'description' => '',
-      'default_value' =>  '-',
-      'allowed_values' =>  "-|Select...
+  
+  if (empty($avail_fields) || ($old_db_version === 0)) {
+    $avail_fields += array(
+      'first_name' => array(
+        'id' => 'first_name',
+        'name' => 'First Name',
+        'type' => 'textfield',
+        'description' => '',
+        'default_value' =>  '',
+        'allowed_values' =>  '',
+      ),
+      'last_name' => array(
+        'id' => 'last_name',
+        'name' => 'Last Name',
+        'type' => 'textfield',
+        'description' => '',
+        'default_value' =>  '',
+        'allowed_values' =>  '',
+      ),
+      'email' => array(
+        'id' => 'email',
+        'name' => 'Email',
+        'type' => 'autoreply_email',
+        'description' => '',
+        'default_value' =>  '',
+        'allowed_values' =>  '',
+      ),
+      'address' => array(
+        'id' => 'address',
+        'name' => 'Address',
+        'type' => 'textfield',
+        'description' => '',
+        'default_value' =>  '',
+        'allowed_values' =>  '',
+      ),
+      'city' => array(
+        'id' => 'city',
+        'name' => 'City',
+        'type' => 'textfield',
+        'description' => '',
+        'default_value' =>  '',
+        'allowed_values' =>  '',
+      ),
+      'state_province' => array(
+        'id' => 'state_province',
+        'name' => 'State/Province',
+        'type' => 'textfield',
+        'description' => '',
+        'default_value' =>  '',
+        'allowed_values' =>  '',
+      ),
+      'country' => array(
+        'id' => 'country',
+        'name' => 'Country',
+        'type' => 'select',
+        'description' => '',
+        'default_value' =>  '-',
+        'allowed_values' =>  "-|Select...
 Afghanistan
 Åland Islands
 Albania
@@ -576,31 +581,32 @@ Western Sahara
 Yemen
 Zambia
 Zimbabwe",
-    ),
-    'message' => array(
-      'id' => 'message',
-      'name' => 'Message',
-      'type' => 'textarea',
-      'description' => '',
-      'default_value' =>  '',
-      'allowed_values' =>  '',
-    ),
-    'captcha' => array(
-      'id' => 'captcha',
-      'name' => 'Captcha',
-      'type' => 'captcha',
-      'description' => '',
-      'default_value' =>  '',
-      'allowed_values' =>  '',
-    ),
-  );
-  update_option('accua_forms_avail_fields', $avail_fields);
-  
+      ),
+      'message' => array(
+        'id' => 'message',
+        'name' => 'Message',
+        'type' => 'textarea',
+        'description' => '',
+        'default_value' =>  '',
+        'allowed_values' =>  '',
+      ),
+      'captcha' => array(
+        'id' => 'captcha',
+        'name' => 'Captcha',
+        'type' => 'captcha',
+        'description' => '',
+        'default_value' =>  '',
+        'allowed_values' =>  '',
+      ),
+    );
+    update_option('accua_forms_avail_fields', $avail_fields);
+  }
   
   $form_data = get_option('accua_forms_default_form_data',array());
   if (!is_array($form_data)) {
     $form_data = array();
   }
+  
   $form_data += array(
     'success_message' => '<div style="padding: 10px; background-color: #fbf8b2; border: 1px solid #f7c84b;">
 <h2>Thank you {first_name} {last_name},</h2>
@@ -624,6 +630,7 @@ Please try filling in the form again.
 For other possible problems you may have encountered do not hesitate to contact us
 
 </div>',
+    'emails_from_name' => '',
     'emails_from' => '',
     'admin_emails_to' => get_option('admin_email', ''),
     'emails_bcc' => '',
@@ -724,6 +731,7 @@ The Website Team
     'style_submit_color' => '',
     'style_submit_font_size' => '',
   );
+
   update_option('accua_forms_default_form_data', $form_data);
   update_option('accua_forms_db_version', ACCUA_FORMS_DB_VERSION);
 }

@@ -111,14 +111,14 @@ class Accua_Forms_Submissions_List_Table extends WP_List_Table {
         $this->del_items = $wpdb->get_var("SELECT COUNT(*) FROM `{$wpdb->prefix}accua_forms_submissions` WHERE afs_status < 0");
         
         $filter = $filter_query_custom_field = "";
-        $search = NULL;
+        $search = '';
         
         if(isset($get['_wp_http_referer'])) {
           foreach (explode('&', $get['_wp_http_referer']) as $coppia) {
             $param = explode("=", $coppia);
             if($param[0]=='fid' && $param[1]!='-1') $filter .= $wpdb->prepare(" AND afs_form_id = '%s' ", $param[1]);
             if($param[0]=='pid' && $param[1]!='-1') $filter .= $wpdb->prepare(" AND afs_post_id = '%s' ", $param[1]);
-            if($param[0]=='s' && $param[1]!='-1')  $search = esc_sql($param[1]);
+            if($param[0]=='s') $search = trim($param[1]);
           }
         }
         
@@ -129,8 +129,8 @@ class Accua_Forms_Submissions_List_Table extends WP_List_Table {
           $filter .= $wpdb->prepare(" AND afs_post_id = %d ", $get['pid']);
         }
 
-        if(isset($get['s']) && ($get['s'])!=-1) {
-            $search = esc_sql($get['s']);
+        if(isset($get['s'])) {
+            $search = trim($get['s']);
         }
         
         if (isset($get['date_from']) && $get['date_from'] !== '') {
@@ -148,7 +148,12 @@ class Accua_Forms_Submissions_List_Table extends WP_List_Table {
         $this->_column_headers = array($columns, $hidden, $sortable);
         $current_page = $this->get_pagenum();
         
-        $limit = ($current_page - 1) * $per_page;
+        if ($all) {
+          $limit = '';
+        } else {
+          $limit = ($current_page - 1) * $per_page;
+          $limit = "LIMIT {$limit}, {$per_page}";
+        }
         
         $forms_data = get_option('accua_forms_saved_forms', array());
         
@@ -159,9 +164,9 @@ class Accua_Forms_Submissions_List_Table extends WP_List_Table {
         }
         
         $searching_data = array();
-        if( $search != NULL && $search!= '')
+        if($search !== '')
         {
-            $search = trim($search); 
+            $sql_search = $wpdb->prepare("'%s'", "%$search%"); 
             $query1 = " SELECT SQL_CALC_FOUND_ROWS
             afs_id AS ID,
             afs_form_id AS form_id,
@@ -175,20 +180,21 @@ class Accua_Forms_Submissions_List_Table extends WP_List_Table {
             FROM `{$wpdb->prefix}accua_forms_submissions`
             WHERE {$afs_status_cond} {$filter}
             AND (
-            afs_ip LIKE '%{$search}%'
-            OR afs_uri LIKE '%{$search}%'
-            OR afs_referrer LIKE '%{$search}%'
-            OR afs_lang LIKE '%{$search}%'
-            OR afs_created LIKE '%{$search}%'
-            OR afs_submitted LIKE '%{$search}%'
-            OR afs_id LIKE '%{$search}%'
+            afs_ip LIKE {$sql_search}
+            OR afs_uri LIKE {$sql_search}
+            OR afs_referrer LIKE {$sql_search}
+            OR afs_lang LIKE {$sql_search}
+            OR afs_created LIKE {$sql_search}
+            OR afs_submitted LIKE {$sql_search}
+            OR afs_id LIKE {$sql_search}
             OR afs_id
             IN (
               SELECT DISTINCT (afsv_sub_id)
               FROM `{$wpdb->prefix}accua_forms_submissions_values`
-              WHERE afsv_value LIKE '%{$search}%')
+              WHERE afsv_value LIKE {$sql_search})
              )
-            ORDER BY afs_id DESC";
+            ORDER BY afs_id DESC
+            {$limit}";
         }
          else 
         {
@@ -204,7 +210,8 @@ class Accua_Forms_Submissions_List_Table extends WP_List_Table {
           afs_submitted AS submitted
           FROM `{$wpdb->prefix}accua_forms_submissions`
           WHERE {$afs_status_cond} {$filter}
-          ORDER BY afs_id DESC";
+          ORDER BY afs_id DESC
+          {$limit}";
         }
 
         $data1 = $wpdb->get_results($query1, ARRAY_A);
@@ -252,19 +259,17 @@ class Accua_Forms_Submissions_List_Table extends WP_List_Table {
                 $fielddata = "<span style='color: {$value_esc}'><font color='{$value_esc}'>&#9608;</font></span> $value_esc";
               }
             break;
+            case 'password':
+            case 'password-and-confirm':
+              $fielddata = '';
+            break;
             default:
               $fielddata = htmlspecialchars($row->afsv_value,ENT_QUOTES);
           }
           $data[$row->afsv_sub_id]['_field_'.$row->afsv_field_id] = $fielddata;
         }
         
-        $total_items = count($data);
-        if($all) {
-          $this->items = $data;
-        }
-        else {
-          $this->items = array_slice($data,(($current_page-1)*$per_page),$per_page);
-        }
+        $this->items = $data;
        
         $this->set_pagination_args( array(
             'total_items' => $total_items,

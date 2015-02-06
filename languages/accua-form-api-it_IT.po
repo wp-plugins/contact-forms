@@ -1099,3 +1099,12 @@ msgstr "Attenzione: '%element%' deve essere un colore in formato esadecimale com
 
 msgid "Show Captcha"
 msgstr "Mostra Captcha"
+
+msgid "You have to enter a valid email address where required"
+msgstr "Devi inserire un indirizzo email valido dove richiesto"
+
+msgid "From name"
+msgstr "Nome mittente"
+
+msgid "From email"
+msgstr "Email mittente"

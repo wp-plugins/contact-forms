@@ -109,6 +109,7 @@ input[type="text"].accua_form_value, textarea.accua_form_value {
 
 #accua_forms_edit_page #accua_tabs {
   position: relative;
+  margin-top: 20px;
 }
 
 .accua-forms-metabox-holder {

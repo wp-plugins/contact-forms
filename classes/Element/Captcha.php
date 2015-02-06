@@ -17,20 +17,15 @@ class AccuaForm_Element_Captcha extends Element {
 <script type="text/javascript">
 <!--
 if (typeof(accuaform_recaptcha_ajax_loaded) == "undefined" || !accuaform_recaptcha_ajax_loaded) {
+  var accuaform_recaptcha_ajax_loaded = true;
   document.write('<sc'+'ript type="text/javascript" src="//www.google.com/recaptcha/api/js/recaptcha_ajax.js"></sc'+'ript>');
   document.write('<sc'+'ript type="text/javascript" src="$jspath"></sc'+'ript>');
+  document.write('<sc'+'ript type="text/javascript">jQuery(function(){accua_forms_show_recaptcha("{$this->publicKey}", "{$field_id}", {lang: "{$lang}"});});</sc'+'ript>');
 }
 // -->
 </script>
 <input type='button' value='$button_text' class='accua_forms_show_recaptcha_button' onclick='accua_forms_show_recaptcha("{$this->publicKey}", "{$field_id}", {lang: "{$lang}"})' />
 <div id="{$field_id}"></div>
-<script type="text/javascript">
-<!--
-accua_forms_show_recaptcha("{$this->publicKey}", "{$field_id}", {
-  lang: "{$lang}"
-});
-// -->
-</script>
 <noscript>
   		<iframe src="https://www.google.com/recaptcha/api/noscript?k={$this->publicKey}" height="300" width="500" frameborder="0"></iframe><br/>
   		<textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea>

@@ -767,12 +767,12 @@ JS;
     } else {
       var message = '';
       if (!valid_empty) {
-        message += $required_message + '<br />';
+        message += '<li>' + $required_message + '</li>';
       }
       if (!valid_mail) {
-        message += $valid_mail_message + '<br />';
+        message += '<li>' + $valid_mail_message + '</li>';
       }
-      thisform.append('<div class="pfbc-error ui-state-error ui-corner-all">' + message + '</div>');
+      thisform.append('<div class="pfbc-error ui-state-error ui-corner-all"><ul>' + message + '</ul></div>');
       return false;
     }
   }

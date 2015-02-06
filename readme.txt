@@ -2,8 +2,8 @@
 Contributors: cimatti
 Tags: contact, form, forms, contact form, contact forms, feedback, mail, email, ajax, attachment, curriculum, contact us, custom form, excel, form builder, web form, feedback, form manager, form to email, form to database, landing page, file upload, email form, customer request, spare parts, invitations, event forms, qtranslate, w3 total cache, drag and drop, form framework, form designer, form creator, php form builder
 Requires at least: 3.5
-Tested up to: 3.8.2
-Stable tag: 1.3.3
+Tested up to: 4.1
+Stable tag: 1.3.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -58,6 +58,7 @@ WordPress Contact Forms uses [PHP form builder class](http://code.google.com/p/p
 * Color picker field
 * Fieldsets
 * Submissions trash and restore
+* Password fields now saves the hash of the password using wp_hash_password
 
 [Read the full changelog](http://wordpress.org/plugins/contact-forms/changelog/)
 
@@ -79,6 +80,12 @@ For more info, check out the following articles:
 
 
 == Changelog ==
+
+= 1.3.4 =
+* Password fields now saves the hash value of the password using wp_hash_password
+* Field to set the emails "From:" name
+* fixed CAPTCHA field incompatibility with CloudFlare RocketLoader and possibly other JavaScript optimizer
+* fixed glitch in the "Form fields" area on the "Edit form" page with latest versions of WordPress
 
 = 1.3.3 =
 * improved checkboxes, select and radio definition to allow pre-selected options

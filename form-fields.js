@@ -1,7 +1,8 @@
-var wpWidgets;
+var wpWidgets = {};
+var accuaWidgets;
 (function($) {
 
-wpWidgets = {
+accuaWidgets = {
 
     init : function() {
         var rem, sidebars = $('div.widgets-sortables'), isRTL = !! ( 'undefined' != typeof isRtl && isRtl ),
@@ -46,7 +47,7 @@ wpWidgets = {
                         css[margin] = 235 - w + 'px';
                     widget.css(css);
                 }
-                wpWidgets.fixLabels(widget);
+                accuaWidgets.fixLabels(widget);
                 inside.slideDown('fast');
             } else {
                 inside.slideUp('fast', function() {
@@ -58,25 +59,25 @@ wpWidgets = {
 
         //Click sul bottone di salvataggio
         $('input.widget-control-save').live('click', function(){
-            wpWidgets.save( $(this).closest('div.widget'), 0, 1, 0 );
+            accuaWidgets.save( $(this).closest('div.widget'), 0, 1, 0 );
             return false;
         });
 
         //Click sul bottone di rimozione
         $('a.widget-control-remove').live('click', function(){
-            wpWidgets.save( $(this).closest('div.widget'), 1, 1, 0 );
+            accuaWidgets.save( $(this).closest('div.widget'), 1, 1, 0 );
             return false;
         });
 
         //Click sul bottone di chiusura
         $('a.widget-control-close').live('click', function(){
-            wpWidgets.close( $(this).closest('div.widget') );
+            accuaWidgets.close( $(this).closest('div.widget') );
             return false;
         });
 
         //Impostazione titolo e apertura widget se c'è un errore
         sidebars.children('.widget').each(function() {
-            wpWidgets.appendTitle(this);
+            accuaWidgets.appendTitle(this);
             if ( $('p.widget-error', this).length )
                 $('a.widget-action', this).click();
         });
@@ -90,7 +91,7 @@ wpWidgets = {
             zIndex: 5,
             containment: 'document',
             start: function(e,ui) {
-                wpWidgets.fixWebkit(1);
+                accuaWidgets.fixWebkit(1);
                 ui.helper.find('div.widget-description').hide();
                 the_id = this.id;
             },
@@ -98,7 +99,7 @@ wpWidgets = {
                 if ( rem )
                     $(rem).hide();
                 rem = '';
-                wpWidgets.fixWebkit();
+                accuaWidgets.fixWebkit();
             }
         });
 
@@ -111,7 +112,7 @@ wpWidgets = {
             distance: 2,
             containment: 'document',
             start: function(e,ui) {
-                wpWidgets.fixWebkit(1);
+                accuaWidgets.fixWebkit(1);
                 ui.item.children('.widget-inside').hide();
                 ui.item.css({margin:'', 'width':''});
             },
@@ -120,7 +121,7 @@ wpWidgets = {
                     ui.item.draggable('destroy');
 
                 if ( ui.item.hasClass('deleting') ) {
-                    wpWidgets.save( ui.item, 1, 0, 1 ); // delete widget
+                    accuaWidgets.save( ui.item, 1, 0, 1 ); // delete widget
                     ui.item.remove();
                     return;
                 }
@@ -133,7 +134,7 @@ wpWidgets = {
                 ui.item.css({margin:'', 'width':''});
                 the_id = '';
                 
-                wpWidgets.fixWebkit();
+                accuaWidgets.fixWebkit();
                 if ( add ) {
                     if ( 'multi' == add ) {
                         ui.item.html( ui.item.html().replace(/<[^<>]+>/g, function(m){ return m.replace(/__i__|%i%/g, n); }) );
@@ -144,12 +145,12 @@ wpWidgets = {
                         ui.item.attr( 'id', 'new-' + id );
                         rem = 'div#' + id;
                     }
-                    wpWidgets.save( ui.item, 0, 0, 1 );
+                    accuaWidgets.save( ui.item, 0, 0, 1 );
                     ui.item.find('input.add_new').val('');
                     ui.item.find('a.widget-action').click();
                     return;
                 }
-                wpWidgets.saveOrder(sb);
+                accuaWidgets.saveOrder(sb);
             },
             receive: function(e,ui) {
                 var t = $(this);
@@ -252,22 +253,22 @@ wpWidgets = {
                     order = 0;
                     widget.slideUp('fast', function(){
                         $(this).remove();
-                        wpWidgets.saveOrder();
+                        accuaWidgets.saveOrder();
                     });
                 } else {
                     widget.remove();
-                    wpWidgets.resize();
+                    accuaWidgets.resize();
                 }
             } else {
                 $('.ajax-feedback').css('visibility', 'hidden');
                 if ( r && r.length > 2 ) {
                     $('div.widget-content', widget).html(r);
-                    wpWidgets.appendTitle(widget);
-                    wpWidgets.fixLabels(widget);
+                    accuaWidgets.appendTitle(widget);
+                    accuaWidgets.fixLabels(widget);
                 }
             }
             if ( order )
-                wpWidgets.saveOrder();
+                accuaWidgets.saveOrder();
         });
     },
 
@@ -318,6 +319,6 @@ wpWidgets = {
     }
 };
 
-$(document).ready(function($){ wpWidgets.init(); });
+$(document).ready(function($){ accuaWidgets.init(); });
 
 })(jQuery);

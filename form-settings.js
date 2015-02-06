@@ -40,7 +40,7 @@ jQuery(function($){
     }
     
     $.each(
-        ['success_message','error_message','emails_from','admin_emails_to','emails_bcc','admin_emails_subject','admin_emails_message','confirmation_emails_subject','confirmation_emails_message','style_margin','style_border_color','style_border_width','style_border_radius','style_background_color','style_padding','style_color','style_font_size','style_field_spacing','style_field_border_color','style_field_border_width','style_field_border_radius','style_field_background_color','style_field_padding','style_field_color','style_submit_border_color','style_submit_border_width','style_submit_border_radius','style_submit_background_color','style_submit_padding','style_submit_color','style_submit_font_size'],
+        ['success_message','error_message','emails_from_name','emails_from','admin_emails_to','emails_bcc','admin_emails_subject','admin_emails_message','confirmation_emails_subject','confirmation_emails_message','style_margin','style_border_color','style_border_width','style_border_radius','style_background_color','style_padding','style_color','style_font_size','style_field_spacing','style_field_border_color','style_field_border_width','style_field_border_radius','style_field_background_color','style_field_padding','style_field_color','style_submit_border_color','style_submit_border_width','style_submit_border_radius','style_submit_background_color','style_submit_padding','style_submit_color','style_submit_font_size'],
         function(i,key){
           var value = $('#accua_form_'+key+' .accua_form_check_override:checked').val();
           if(value!=undefined && value!=0) {
@@ -70,36 +70,42 @@ jQuery(function($){
       'json'
     )
     */
-        
-    $.ajax(ajaxurl, {
-        'type': 'POST',
-        'data': data,
-        'success': function(){
-          document.getElementById('accua_form_preview_area').src = 'admin-ajax.php?action=accua_forms_preview&fid=' + form_id;
-          try {
-            if (history.pushState && window.location.search.search('page=accua_forms_list') == -1) {
-              history.pushState('', document.title, 'admin.php?page=accua_forms_list&fid=' + form_id);
-              window.onpopstate = function(event) {
-                location.reload();
-              }
-            }
-          } catch (e) {}
-          
-          var success_message = $("<span style='color:#0C0'>Settings saved</span>");
-          save_status.empty();
-          save_status.append(success_message);
-          var success_fadeout = function(){
-            success_message.fadeOut(5000);
-          }
-          setTimeout(success_fadeout, 15000);
-          save_button.removeAttr('disabled');
-        },
-        'error': function(){
-          save_status.empty();
-          save_status.append("<span style='color:#c00'>Error saving settings, please retry</span>");
-          save_button.removeAttr('disabled');
-        }
-    });
     
+    if (accuaWidgets) {
+      $('#widgets-right .button-primary.widget-control-save').click();
+      accuaWidgets.saveOrder();
+    }
+    
+    
+    setTimeout(function(){
+      $.ajax(ajaxurl, {
+          'type': 'POST',
+          'data': data,
+          'success': function(){
+            document.getElementById('accua_form_preview_area').src = 'admin-ajax.php?action=accua_forms_preview&fid=' + form_id;
+            try {
+              if (history.pushState && window.location.search.search('page=accua_forms_list') == -1) {
+                history.pushState('', document.title, 'admin.php?page=accua_forms_list&fid=' + form_id);
+                window.onpopstate = function(event) {
+                  location.reload();
+                }
+              }
+            } catch (e) {}
+            
+            var success_message = $("<span style='color:#0C0'>Settings saved</span>");
+            save_status.empty();
+            save_status.append(success_message);
+            var success_fadeout = function(){
+              success_message.fadeOut(5000);
+            }
+            setTimeout(success_fadeout, 15000);
+            save_button.removeAttr('disabled');
+          },
+          'error': function(){
+            save_status.empty();
+            save_status.append("<span style='color:#c00'>Error saving settings, please retry</span>");
+            save_button.removeAttr('disabled');
+          }
+      }); }, 400); 
   });
 });
